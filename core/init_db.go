@@ -8,10 +8,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
 func InitDB() *gorm.DB {
-	dc := global.Config.DB
+	dc := global.Config.DB   //读库
+	dc1 := global.Config.DB1 //写库
 	db, err := gorm.Open(mysql.Open(dc.DSN()), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true, //不生成外键约束
 	})
@@ -20,15 +22,22 @@ func InitDB() *gorm.DB {
 	}
 	fmt.Println(db, err)
 	sqlDB, err := db.DB()
-
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
 	sqlDB.SetMaxIdleConns(10)
-
-	// SetMaxOpenConns sets the maximum number of open connections to the database.
 	sqlDB.SetMaxOpenConns(100)
-
-	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 	sqlDB.SetConnMaxLifetime(time.Hour)
+	logrus.Infof("数据库连接成功!")
 
+	if !dc1.Empty() {
+		//读写库不为空就注册读写分离的配置
+		db.Use(dbresolver.Register(dbresolver.Config{
+			Sources:  []gorm.Dialector{mysql.Open(dc1.DSN())}, // 写
+			Replicas: []gorm.Dialector{mysql.Open(dc.DSN())},  // 读
+			Policy:   dbresolver.RandomPolicy{},
+		}))
+
+		if err != nil {
+			logrus.Fatalf("读写配置错误 %s", err)
+		}
+	}
 	return db
 }
