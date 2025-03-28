@@ -1,3 +1,23 @@
 system:
   ip:  # 需要提供具体的 IP 地址，例如 "192.168.1.1"
   port: 8080
+  env: dev
+log:
+  app: blog_server
+  dir: logs
+db:
+  user: root
+  password: 123456
+  host: localhost
+  port: 3306
+  db: blog
+  debug: false
+  source: mysql
+db1:
+  user: root
+  password: 123456
+  host: localhost
+  port: 3306
+  db: blog
+  debug: false
+  source: mysql

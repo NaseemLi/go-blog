@@ -1,0 +1,5 @@
+[2025-03-28 19:04:55] [33m[warning][0m main.go:17 main.main xxx
+[2025-03-28 19:04:55] [37m[debug][0m main.go:18 main.main yyy
+[2025-03-28 19:04:55] [31m[error][0m main.go:19 main.main 222
+[2025-03-28 19:04:55] [36m[info][0m main.go:20 main.main 111
+[2025-03-28 19:53:05] [31m[fatal][0m init_db.go:19 goblog/core.InitDB 数据库连接失败Error 1049 (42000): Unknown database 'gorm_new_db'
