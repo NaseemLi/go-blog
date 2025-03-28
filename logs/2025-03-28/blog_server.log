@@ -5,3 +5,4 @@
 [2025-03-28 19:53:05] [31m[fatal][0m init_db.go:19 goblog/core.InitDB 数据库连接失败Error 1049 (42000): Unknown database 'gorm_new_db'
 [2025-03-28 20:22:25] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-03-28 20:22:47] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-03-28 20:49:07] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
