@@ -16,3 +16,7 @@
 [2025-04-02 17:29:52] [36m[info][0m flag_db.go:19 goblog/flags.FlagDB 数据库迁移成功!
 [2025-04-02 17:31:33] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-02 17:31:33] [36m[info][0m flag_db.go:19 goblog/flags.FlagDB 数据库迁移成功!
+[2025-04-02 17:43:54] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-02 17:43:54] [36m[info][0m flag_db.go:20 goblog/flags.FlagDB 数据库迁移成功!
+[2025-04-02 18:00:49] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-02 18:00:49] [36m[info][0m flag_db.go:31 goblog/flags.FlagDB 数据库迁移成功!
