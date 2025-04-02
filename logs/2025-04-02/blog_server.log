@@ -1,0 +1,1 @@
+[2025-04-02 16:30:18] [31m[fatal][0m init_db.go:21 goblog/core.InitDB 数据库连接失败dial tcp [::1]:3306: connect: connection refused
