@@ -4,6 +4,7 @@ import (
 	"goblog/core"
 	"goblog/flags"
 	"goblog/global"
+	"goblog/router"
 )
 
 func main() {
@@ -13,4 +14,7 @@ func main() {
 	core.InitLogrus()
 	global.DB = core.InitDB()
 	flags.Run()
+
+	//启动 web 程序
+	router.Run()
 }
