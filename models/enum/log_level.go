@@ -7,3 +7,15 @@ const (
 	LogWarnLevel LogLevelType = 2
 	LogErrLevel  LogLevelType = 3
 )
+
+func (l LogLevelType) String() string {
+	switch l {
+	case LogInfoLevel:
+		return "info"
+	case LogWarnLevel:
+		return "Warn"
+	case LogErrLevel:
+		return "Error"
+	}
+	return ""
+}

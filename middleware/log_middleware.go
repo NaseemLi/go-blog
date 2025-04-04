@@ -1,23 +1,40 @@
 package middleware
 
 import (
-	"bytes"
-	"fmt"
-	"io"
+	logservice "goblog/service/log_service"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
-func LogMiddleware(c *gin.Context) {
-	//请求中间件
-	byteData, err := io.ReadAll(c.Request.Body) //阅后即焚
-	if err != nil {
-		logrus.Errorf(err.Error())
-	}
-	fmt.Println("body: ", string(byteData))
-	c.Request.Body = io.NopCloser(bytes.NewReader(byteData))
-	c.Next()
-	//相应中间件
+type ResponseWriter struct {
+	gin.ResponseWriter
+	Body []byte
+	Head http.Header
+}
 
+func (w *ResponseWriter) Write(data []byte) (int, error) {
+	w.Body = append(w.Body, data...)
+	return w.ResponseWriter.Write(data)
+}
+
+func (w *ResponseWriter) Header() http.Header {
+	return w.Head
+}
+
+func LogMiddleware(c *gin.Context) {
+	log := logservice.NewActionLogByGin(c)
+	//请求中间件
+	log.SetRequest(c)
+	c.Set("log", log)
+
+	res := &ResponseWriter{
+		ResponseWriter: c.Writer,
+		Head:           make(http.Header),
+	}
+	c.Writer = res
+	c.Next()
+	log.SetResponse(res.Body)
+	log.SetResponseHeader(res.Head)
+	log.Save()
 }
