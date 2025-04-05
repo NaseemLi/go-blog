@@ -36,5 +36,5 @@ func LogMiddleware(c *gin.Context) {
 	c.Next()
 	log.SetResponse(res.Body)
 	log.SetResponseHeader(res.Head)
-	log.Save()
+	log.MiddlewareSave()
 }

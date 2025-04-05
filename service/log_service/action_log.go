@@ -13,6 +13,8 @@ import (
 	"reflect"
 	"strings"
 
+	e "github.com/pkg/errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -30,6 +32,7 @@ type ActionLog struct {
 	showResponse       bool
 	itemList           []string
 	responseHeader     http.Header
+	isMiddleware       bool
 }
 
 func (ac *ActionLog) ShowRequest() {
@@ -99,6 +102,16 @@ func (ac *ActionLog) SetItemError(label string, value any) {
 	ac.setItem(label, value, enum.LogErrLevel)
 }
 
+func (ac *ActionLog) SetError(label string, err error) {
+	msg := e.WithStack(err)
+	logrus.Errorf("%s %s", label, err.Error())
+	ac.itemList = append(ac.itemList, fmt.Sprintf("<div class=\"log_error\"><div class=\"line\"><div class=\"label\">%s</div><div class=\"value\">%s</div><div class=\"type\">%T</div></div><div class=\"stack\">%+v</div></div>",
+		label,
+		err,
+		err,
+		msg))
+}
+
 func (ac *ActionLog) SetRequest(c *gin.Context) {
 	byteData, err := io.ReadAll(c.Request.Body) //阅后即焚
 	if err != nil {
@@ -134,13 +147,43 @@ func Getlog(c *gin.Context) *ActionLog {
 	return log
 }
 
+func (ac ActionLog) MiddlewareSave() {
+	if ac.log == nil {
+		//创建
+		ac.isMiddleware = true
+		ac.Save()
+		return
+	}
+	//在视图中 save 过,更新
+	//响应头
+	if ac.showResponseHeader {
+		byteData, _ := json.Marshal(ac.responseHeader)
+		ac.itemList = append(ac.itemList, fmt.Sprintf("<div class=\"log_response_header\"><div class=\"log_response_body\"><pre class=\"log_json_body\">%s</pre></div></div>",
+			string(byteData)))
+	}
+	//设置响应
+	if ac.showResponse {
+		ac.itemList = append(ac.itemList, fmt.Sprintf("<div class=\"log_response\"><pre class=\"log_json_body\">%s</pre></div>", string(
+			ac.responseBody,
+		)))
+		ac.Save()
+	}
+}
+
 // todo 日志流的统一 日志中 addr 返回地址问题
-func (ac ActionLog) Save() {
+func (ac ActionLog) Save() (id uint) {
+	//1. save 只能在中间件中调用
+	//2. 在视图里面 调 save 需要返回日志的 ID
+
 	if ac.log != nil {
+		newContent := strings.Join(ac.itemList, "\n")
+		content := ac.log.Content + "\n" + newContent
+
 		//之前已经 save 过,那就更新
 		global.DB.Model(ac.log).Updates(map[string]any{
-			"title": "更新",
+			"content": content,
 		})
+		ac.itemList = []string{}
 		return
 	}
 
@@ -164,17 +207,19 @@ func (ac ActionLog) Save() {
 	//中间content
 	newItemList = append(newItemList, ac.itemList...)
 
-	//响应头
-	if ac.showResponseHeader {
-		byteData, _ := json.Marshal(ac.responseHeader)
-		newItemList = append(newItemList, fmt.Sprintf("<div class=\"log_response_header\"><div class=\"log_response_body\"><pre class=\"log_json_body\">%s</pre></div></div>",
-			string(byteData)))
-	}
-	//设置响应
-	if ac.showResponse {
-		newItemList = append(newItemList, fmt.Sprintf("<div class=\"log_response\"><pre class=\"log_json_body\">%s</pre></div>", string(
-			ac.responseBody,
-		)))
+	if ac.isMiddleware {
+		//响应头
+		if ac.showResponseHeader {
+			byteData, _ := json.Marshal(ac.responseHeader)
+			newItemList = append(newItemList, fmt.Sprintf("<div class=\"log_response_header\"><div class=\"log_response_body\"><pre class=\"log_json_body\">%s</pre></div></div>",
+				string(byteData)))
+		}
+		//设置响应
+		if ac.showResponse {
+			newItemList = append(newItemList, fmt.Sprintf("<div class=\"log_response\"><pre class=\"log_json_body\">%s</pre></div>", string(
+				ac.responseBody,
+			)))
+		}
 	}
 
 	ip := ac.c.ClientIP()
@@ -197,4 +242,6 @@ func (ac ActionLog) Save() {
 		return
 	}
 	ac.log = &log
+	ac.itemList = []string{}
+	return log.ID
 }

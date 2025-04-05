@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type Siteapi struct {
@@ -24,7 +23,7 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 }
 
 type SiteUpdateRequest struct {
-	Name string `json:"name"`
+	Name string `json:"name" binding:"required"`
 }
 
 func (Siteapi) SiteUpdateView(c *gin.Context) {
@@ -41,12 +40,14 @@ func (Siteapi) SiteUpdateView(c *gin.Context) {
 	var cr SiteUpdateRequest
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
-		logrus.Errorf(err.Error())
+		log.SetError("参数绑定失败", err)
 	}
 	log.SetItemInfo("结构体", cr)
 
+	id := log.Save()
 	c.JSON(200, gin.H{
 		"code": 0,
 		"msg":  "站点信息",
+		"data": id,
 	})
 }
