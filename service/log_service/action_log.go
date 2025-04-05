@@ -144,10 +144,16 @@ func Getlog(c *gin.Context) *ActionLog {
 	if !ok {
 		return NewActionLogByGin((c))
 	}
+	c.Set("saveLog", true)
 	return log
 }
 
 func (ac ActionLog) MiddlewareSave() {
+	_saveLog, _ := ac.c.Get("savelog")
+	saveLog, _ := _saveLog.(bool)
+	if !saveLog {
+		return
+	}
 	if ac.log == nil {
 		//创建
 		ac.isMiddleware = true
@@ -184,7 +190,7 @@ func (ac ActionLog) Save() (id uint) {
 			"content": content,
 		})
 		ac.itemList = []string{}
-		return
+		return ac.log.ID
 	}
 
 	var newItemList []string
