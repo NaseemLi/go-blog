@@ -16,6 +16,7 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 
 type SiteUpdateRequest struct {
 	Name string `json:"name" binding:"required"`
+	Age  string `json:"age" binding:"required" label:"年龄"`
 }
 
 func (Siteapi) SiteUpdateView(c *gin.Context) {
@@ -23,7 +24,7 @@ func (Siteapi) SiteUpdateView(c *gin.Context) {
 	var cr SiteUpdateRequest
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
-		res.FailWithMsg(err.Error(), c)
+		res.FailWithError(err, c)
 		return
 	}
 

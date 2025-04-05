@@ -1,6 +1,8 @@
 package res
 
 import (
+	"goblog/utils/validate"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -44,6 +46,13 @@ func OkWithData(data any, c *gin.Context) {
 	Response{SuccessCode, data, "成功"}.Json(c)
 }
 
+func OkWithList(list any, count int, c *gin.Context) {
+	Response{SuccessCode, map[string]any{
+		"list":  list,
+		"count": count,
+	}, "成功"}.Json(c)
+}
+
 func OkWithMsg(msg string, c *gin.Context) {
 	Response{FailValidCode, empty, msg}.Json(c)
 }
@@ -58,4 +67,9 @@ func FailWithData(data any, msg string, c *gin.Context) {
 
 func FailWithCode(code int, c *gin.Context) {
 	Response{Code(code), empty, Code(code).String()}.Json(c)
+}
+
+func FailWithError(err error, c *gin.Context) {
+	data, msg := validate.ValidateError(err)
+	FailWithData(data, msg, c)
 }
