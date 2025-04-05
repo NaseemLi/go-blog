@@ -8,6 +8,7 @@ import (
 	"goblog/models/enum"
 	"reflect"
 	"strings"
+	"time"
 
 	e "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,6 +23,7 @@ type RuntimeLog struct {
 }
 
 func (ac RuntimeLog) Save() {
+	ac.SetNowTime()
 	//判断创建还是更新
 	var log models.LogModel
 
@@ -106,6 +108,10 @@ func (ac *RuntimeLog) SetItemWarn(label string, value any) {
 
 func (ac *RuntimeLog) SetItemError(label string, value any) {
 	ac.setItem(label, value, enum.LogErrLevel)
+}
+
+func (ac *RuntimeLog) SetNowTime() {
+	ac.itemList = append(ac.itemList, fmt.Sprintf("<div class=\"log_time\">%s</div>", time.Now().Format("2006-01-02 15:04:05")))
 }
 
 func (ac *RuntimeLog) SetError(label string, err error) {
