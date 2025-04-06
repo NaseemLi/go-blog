@@ -8,6 +8,7 @@ import (
 	"goblog/global"
 	"goblog/models"
 	"goblog/models/enum"
+	"goblog/utils/jwts"
 	"io"
 	"net/http"
 	"reflect"
@@ -230,7 +231,11 @@ func (ac ActionLog) Save() (id uint) {
 
 	ip := ac.c.ClientIP()
 	addr := core.GetipADDR(ip)
-	userID := uint(1)
+	claims, err := jwts.ParseTokenByGin(ac.c)
+	userID := uint(0)
+	if err == nil && claims != nil {
+		userID = claims.userID
+	}
 
 	log := models.LogModel{
 		LogType: enum.ActionLogType,

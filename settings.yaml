@@ -6,6 +6,10 @@ system:
 log:
   app: blog_server
   dir: logs
+jwt:
+  expire: 3
+  secret: xxx
+  issuer: naseem
 db:
   user: root
   password: 123456
