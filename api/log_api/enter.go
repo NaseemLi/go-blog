@@ -1,11 +1,13 @@
 package logapi
 
 import (
+	"fmt"
 	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
 	"goblog/models/enum"
+	logservice "goblog/service/log_service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -77,4 +79,27 @@ func (LogApi) LogReadView(c *gin.Context) {
 	}
 
 	res.OkWithMsg("日志读取成功", c)
+}
+
+func (LogApi) LogRemoveView(c *gin.Context) {
+	var cr models.RemoveRequest
+	err := c.ShouldBindJSON(&cr)
+	if err != nil {
+		res.FailWithError(err, c)
+		return
+	}
+	log := logservice.Getlog(c)
+	log.ShowRequest()
+	log.ShowResponse()
+
+	var LogList []models.LogModel
+	global.DB.Find(&LogList, "id in ?", cr.IDList)
+
+	if len(LogList) > 0 {
+		global.DB.Delete(&LogList)
+	}
+
+	msg := fmt.Sprintf("日志删除成功,共删除%d条", len(LogList))
+
+	res.OkWithMsg(msg, c)
 }
