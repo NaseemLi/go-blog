@@ -13,6 +13,7 @@ func main() {
 	core.ReadConf()
 	core.InitLogrus()
 	global.DB = core.InitDB()
+	global.Redis = core.InitRedis()
 	flags.Run()
 
 	//启动 web 程序

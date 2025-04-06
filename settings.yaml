@@ -5,7 +5,11 @@ system:
   gin_mode: debug
 log:
   app: blog_server
-  dir: logs
+  dir:
+redis:
+  addr: 127.0.0.1:6379
+  password:
+  db: 2
 jwt:
   expire: 3
   secret: xxx

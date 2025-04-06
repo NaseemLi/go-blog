@@ -6,6 +6,7 @@ import (
 	"goblog/global"
 	"os"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -74,8 +75,8 @@ func (hook FileDateHook) Fire(entry *logrus.Entry) error {
 	}
 	// 时间不等
 	hook.file.Close()
-	os.MkdirAll(fmt.Sprintf("%s/%s", hook.logPath, timer), os.ModePerm)
-	filename := fmt.Sprintf("%s/%s/%s.log", hook.logPath, timer, hook.appName)
+	os.MkdirAll(filepath.Join(hook.logPath, timer), os.ModePerm)
+	filename := filepath.Join(hook.logPath, timer, hook.appName+".log")
 
 	hook.file, _ = os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	hook.fileDate = timer
@@ -85,14 +86,14 @@ func (hook FileDateHook) Fire(entry *logrus.Entry) error {
 
 func InitFile(logPath, appName string) {
 	fileDate := time.Now().Format("2006-01-02")
-	//创建目录
-	err := os.MkdirAll(fmt.Sprintf("%s/%s", logPath, fileDate), os.ModePerm)
+	logPath = filepath.Join(".", "logs")
+	err := os.MkdirAll(filepath.Join(logPath, fileDate), os.ModePerm)
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
 
-	filename := fmt.Sprintf("%s/%s/%s.log", logPath, fileDate, appName)
+	filename := filepath.Join(logPath, fileDate, appName+".log")
 	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		logrus.Error(err)
