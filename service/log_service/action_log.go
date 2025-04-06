@@ -234,7 +234,7 @@ func (ac ActionLog) Save() (id uint) {
 	claims, err := jwts.ParseTokenByGin(ac.c)
 	userID := uint(0)
 	if err == nil && claims != nil {
-		userID = claims.userID
+		userID = claims.UserID
 	}
 
 	log := models.LogModel{
@@ -247,7 +247,7 @@ func (ac ActionLog) Save() (id uint) {
 		Addr:    addr,
 	}
 
-	err := global.DB.Create(&log).Error
+	err = global.DB.Create(&log).Error
 	if err != nil {
 		logrus.Errorf("日志创建失败 %s", err)
 		return

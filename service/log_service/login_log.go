@@ -18,7 +18,7 @@ func NewLoginSuccess(c *gin.Context, loginType enum.LoginType) {
 	userID := uint(0)
 	userName := ""
 	if err == nil && claims != nil {
-		userID = claims.userID
+		userID = claims.UserID
 		userName = claims.Username
 	}
 

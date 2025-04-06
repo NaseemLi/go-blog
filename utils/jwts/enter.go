@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -59,4 +60,12 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 		return claims, nil
 	}
 	return nil, errors.New("invalid token")
+}
+
+func ParseTokenByGin(c *gin.Context) (*MyClaims, error) {
+	token := c.GetHeader("token")
+	if token == "" {
+		token = c.Query("token")
+	}
+	return ParseToken(token)
 }
