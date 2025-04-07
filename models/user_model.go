@@ -1,18 +1,22 @@
 package models
 
-import "time"
+import (
+	"goblog/models/enum"
+	"time"
+)
 
 type UserModel struct {
 	Model
-	Username       string `gorm:"size:32" json:"username"`  // 用户名
-	Nickname       string `gorm:"size:32" json:"nickname"`  // 昵称
-	Avatar         string `gorm:"size:256" json:"avatar"`   // 头像
-	Abstract       string `gorm:"size:256" json:"abstract"` // 简介
-	RegisterSource int8   `json:"registerSource"`           // 注册来源
-	CodeAge        int    `json:"codeAge"`                  // 码龄
-	Password       string `gorm:"size:64" json:"-"`         // 密码（不序列化为 JSON）
-	Email          string `gorm:"size:256" json:"email"`    // 邮箱
-	OpenID         string `gorm:"size:64" json:"openID"`    // 第三方登录的唯一 ID
+	Username       string        `gorm:"size:32" json:"username"`  // 用户名
+	Nickname       string        `gorm:"size:32" json:"nickname"`  // 昵称
+	Avatar         string        `gorm:"size:256" json:"avatar"`   // 头像
+	Abstract       string        `gorm:"size:256" json:"abstract"` // 简介
+	RegisterSource int8          `json:"registerSource"`           // 注册来源
+	CodeAge        int           `json:"codeAge"`                  // 码龄
+	Password       string        `gorm:"size:64" json:"-"`         // 密码（不序列化为 JSON）
+	Email          string        `gorm:"size:256" json:"email"`    // 邮箱
+	OpenID         string        `gorm:"size:64" json:"openID"`    // 第三方登录的唯一 ID
+	Role           enum.RoleType `json:"role"`                     //1管理员 2用户 3访客
 }
 
 type UserConfModel struct {

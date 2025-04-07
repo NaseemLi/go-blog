@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"goblog/global"
+	"goblog/models/enum"
 	"strings"
 	"time"
 
@@ -12,9 +13,9 @@ import (
 )
 
 type Claims struct {
-	UserID   uint   `json:"userID"`
-	Username string `json:"username"`
-	Role     int8   `json:"role"`
+	UserID   uint          `json:"userID"`
+	Username string        `json:"username"`
+	Role     enum.RoleType `json:"role"`
 }
 
 type MyClaims struct {
