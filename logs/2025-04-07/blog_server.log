@@ -11,3 +11,9 @@
 [2025-04-07 19:58:23] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
 [2025-04-07 20:03:05] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-07 20:03:05] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-07 20:22:14] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-07 20:22:14] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-07 20:22:42] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-07 20:26:39] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-07 20:31:48] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-07 20:31:48] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
