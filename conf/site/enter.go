@@ -21,6 +21,7 @@ type Seo struct {
 type About struct {
 	SiteDate string `yaml:"siteDate" json:"siteDate"` //年月日
 	QQ       string `yaml:"qq" json:"qq"`
+	Version  string `yaml:"-" json:"version"`
 	Wechat   string `yaml:"wechat" json:"wechat"`
 	Gitee    string `yaml:"gitee" json:"gitee"`
 	Bilibili string `yaml:"bilibili" json:"bilibili"`
