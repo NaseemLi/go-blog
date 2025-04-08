@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"goblog/common/res"
+	"goblog/global"
 	"goblog/utils"
 	"strings"
 
@@ -21,8 +22,9 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 	}
 
 	//判断文件大小
-	if fileHeader.Size > 2*1024*1024 {
-		res.FailWithMsg("文件大小大于 2 MB", c)
+	s := global.Config.Upload.Size
+	if fileHeader.Size > s*1024*1024 {
+		res.FailWithMsg(fmt.Sprintf("文件大小大于%dMB", s), c)
 	}
 	//后缀判断
 	filename := fileHeader.Filename
@@ -36,23 +38,15 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 	res.Ok("/"+filePath, "图片上传成功", c)
 }
 
-var whiteList = []string{
-	"jpg",
-	"jpeg",
-	"png",
-	"webp",
-	"git",
-}
-
 func imageSuffixJudge(filename string) (err error) {
 	parts := strings.Split(filename, ".")
 	if len(parts) < 2 {
 		return errors.New("错误的文件名")
 	}
-	suffix := parts[len(parts)-1]
+	suffix := strings.ToLower(parts[len(parts)-1])
 
 	// 假设 whiteList 是 []string 类型
-	if !utils.InList[string](suffix, whiteList) {
+	if !utils.InList(suffix, global.Config.Upload.WhiteList) {
 		return errors.New("文件非法")
 	}
 	return nil

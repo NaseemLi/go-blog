@@ -26,6 +26,14 @@ jwt:
   expire: 3
   secret: xxx
   issuer: naseem
+upload:
+  size: 3
+  whiteList:
+  - jpg
+  - jpeg
+  - png
+  - gif
+  uploadDir: images001
 redis:
   addr: 127.0.0.1:6379
   password: ""
