@@ -1,29 +1,87 @@
 system:
-  ip:  # 需要提供具体的 IP 地址，例如 "192.168.1.1"
+  ip: ""
   port: 8080
-  env: dev
   gin_mode: debug
+  env: dev
 log:
   app: blog_server
-  dir:
-ai:
-  enable: 
-  secretKey: 
-  nickname: 
-  avatar: 
-redis:
-  addr: 127.0.0.1:6379
-  password:
-  db: 2
-jwt:
-  expire: 3
-  secret: xxx
-  issuer: naseem
+  dir: ""
 db:
   user: root
-  password: 123456
+  password: "123456"
   host: localhost
   port: 3306
   db: blog
   debug: false
   source: mysql
+db1:
+  user: ""
+  password: ""
+  host: ""
+  port: 0
+  db: ""
+  debug: false
+  source: ""
+jwt:
+  expire: 3
+  secret: xxx
+  issuer: naseem
+redis:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 2
+site:
+  siteInfo:
+    title: test1
+    log: ""
+    beian: ""
+    mode: 3
+  project:
+    title: ""
+    icon: ""
+    webPath: ""
+  seo:
+    keywords: ""
+    description: ""
+  login:
+    qqLogin: false
+    usernamePwdLogin: false
+    emailLogin: false
+    captcha: false
+  indexRight:
+    list: []
+  article:
+    noExamine: false
+  about:
+    siteDate: "1"
+    qq: "2"
+    wechat: "3"
+    gitee: "4"
+    bilibili: ""
+    github: ""
+email:
+  domain: ""
+  port: 0
+  sendEmail: ""
+  authCode: ""
+  sendNickname: ""
+  ssl: false
+  tls: false
+qq:
+  appID: "1231231"
+  appKey: '*******'
+  redirect: "123131"
+qiniu:
+  enable: false
+  accessKey: ""
+  secretKey: ""
+  bucket: ""
+  uri: ""
+  region: ""
+  prefix: ""
+  size: 0
+ai:
+  enable: false
+  secretKey: ""
+  nickname: ""
+  avatar: ""

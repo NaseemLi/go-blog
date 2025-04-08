@@ -11,5 +11,5 @@ func SiteRouter(r *gin.RouterGroup) {
 	app := api.App.Siteapi
 	r.GET("site/qq_url", app.SiteInfoQQView)
 	r.GET("site/:name", app.SiteInfoView)
-	r.PUT("site", middleware.AdminMiddelware, app.SiteUpdateView)
+	r.PUT("site/:name", middleware.AdminMiddelware, app.SiteUpdateView)
 }

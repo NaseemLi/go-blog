@@ -1,0 +1,4 @@
+[2025-04-08 19:34:36] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-08 19:34:36] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-08 19:43:53] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-08 19:43:53] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
