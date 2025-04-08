@@ -35,14 +35,14 @@ site:
     title: test1
     log: ""
     beian: ""
-    mode: 3
+    mode: 1
   project:
-    title: ""
-    icon: ""
-    webPath: ""
+    title: golang-blog
+    icon: /xxx.png
+    webPath: uploads/index.html
   seo:
-    keywords: ""
-    description: ""
+    keywords: 关键词测试
+    description: 介绍测试
   login:
     qqLogin: false
     usernamePwdLogin: false
@@ -54,9 +54,9 @@ site:
     noExamine: false
   about:
     siteDate: "1"
-    qq: "2"
-    wechat: "3"
-    gitee: "4"
+    qq: "635220481"
+    wechat: N4seem
+    gitee: ""
     bilibili: ""
     github: ""
 email:

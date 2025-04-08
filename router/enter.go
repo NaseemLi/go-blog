@@ -17,6 +17,7 @@ func Run() {
 	nr.Use(middleware.LogMiddleware)
 	SiteRouter(nr)
 	LogRouter(nr)
+	ImageRouter(nr)
 
 	addr := global.Config.System.Addr()
 	r.Run(addr)
