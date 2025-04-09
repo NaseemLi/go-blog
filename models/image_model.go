@@ -12,5 +12,5 @@ type ImageModel struct {
 }
 
 func (i ImageModel) WebPath() string {
-	return fmt.Sprintf("/")
+	return fmt.Sprintf("/" + i.Path)
 }
