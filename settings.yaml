@@ -80,14 +80,14 @@ qq:
   appKey: '*******'
   redirect: "123131"
 qiniu:
-  enable: false
-  accessKey: ""
-  secretKey: ""
-  bucket: ""
-  uri: ""
-  region: ""
-  prefix: ""
-  size: 0
+  enable: true
+  accessKey: "a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z"
+  secretKey: "iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc"
+  bucket: naseemblog
+  uri: https://image.xxx
+  region: z2
+  prefix: blog
+  size: 3
 ai:
   enable: false
   secretKey: ""
