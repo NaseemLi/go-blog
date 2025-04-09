@@ -14,9 +14,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ImageApi struct {
-}
-
 func (ImageApi) ImageUploadView(c *gin.Context) {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
@@ -53,7 +50,6 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 		res.Ok(model.WebPath(), "上传成功", c)
 		return
 	}
-	fmt.Println(hash)
 	filePath := fmt.Sprintf("uploads/images/%s/%s.%s", global.Config.Upload.UploadDir, hash, suffix)
 
 	//入库
@@ -85,5 +81,5 @@ func imageSuffixJudge(filename string) (suffix string, err error) {
 		err = errors.New("文件非法")
 		return
 	}
-	return nil
+	return
 }
