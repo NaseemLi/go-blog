@@ -84,7 +84,7 @@ qiniu:
   accessKey: "a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z"
   secretKey: "iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc"
   bucket: naseemblog
-  uri: https://image.xxx
+  uri: http://sugcd359c.hn-bkt.clouddn.com
   region: z2
   prefix: blog
   size: 3

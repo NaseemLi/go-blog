@@ -1,14 +1,13 @@
 package imageapi
 
 import (
-	"errors"
+	"crypto/md5"
 	"fmt"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
-	"goblog/utils"
+	"goblog/utils/file"
 	"io"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -28,7 +27,7 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 	}
 	//后缀判断
 	filename := fileHeader.Filename
-	suffix, err := imageSuffixJudge(filename)
+	suffix, err := file.ImageSuffixJudge(filename)
 	if err != nil {
 		res.FailWithError(err, c)
 		return
@@ -40,7 +39,7 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 		return
 	}
 	byteData, _ := io.ReadAll(file)
-	hash := utils.Md5(byteData)
+	hash := fmt.Sprintf("%x", md5.Sum(byteData))
 	//判断 hash 有无
 	var model models.ImageModel
 	err = global.DB.Take(&model, "hash = ?", hash).Error
@@ -66,20 +65,4 @@ func (ImageApi) ImageUploadView(c *gin.Context) {
 	}
 	c.SaveUploadedFile(fileHeader, filePath)
 	res.Ok(model.WebPath(), "图片上传成功", c)
-}
-
-func imageSuffixJudge(filename string) (suffix string, err error) {
-	parts := strings.Split(filename, ".")
-	if len(parts) < 2 {
-		err = errors.New("错误的文件名")
-		return
-	}
-	suffix = strings.ToLower(parts[len(parts)-1])
-
-	// 假设 whiteList 是 []string 类型
-	if !utils.InList(suffix, global.Config.Upload.WhiteList) {
-		err = errors.New("文件非法")
-		return
-	}
-	return
 }
