@@ -9,4 +9,5 @@ type QiNiu struct {
 	Region    string `yaml:"region"     json:"region"`
 	Prefix    string `yaml:"prefix"     json:"prefix"`
 	Size      int    `yaml:"size"       json:"size"` // 大小限制，单位: MB
+	Expiry    int    `yaml:"expiry" json:"expiry"`
 }

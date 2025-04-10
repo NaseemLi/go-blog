@@ -88,6 +88,7 @@ qiniu:
   region: z2
   prefix: blog
   size: 3
+  expiry: 60
 ai:
   enable: false
   secretKey: ""

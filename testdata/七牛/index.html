@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>七牛云上传测试</title>
+    <script src="testdata/七牛/qiniu.min.js"></script>
+</head>
+<body>
+    <input id="uploader" type="file">
+    <button onclick="upload()">上传</button>
+
+    <script>
+        function upload() {
+            const uploader = document.getElementById("uploader");
+            const file = uploader.files[0];
+            if (!file) {
+                alert("请选择文件");
+                return;
+            }
+
+            // 你写死的测试 token（只要有效就行）
+            const token = "a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z:lCjLPnqeQsTJHES0T1g8nhbXYn0=:eyJkZWFkbGluZSI6MTc0NDI5MTY1OCwic2NvcGUiOiJuYXNlZW1ibG9nIn0=";
+
+            const observer = {
+                next(res) {
+                    console.log("进度:", res.total.percent + "%");
+                },
+                error(err) {
+                    console.error("上传失败:", err);
+                    alert("上传失败");
+                },
+                complete(res) {
+                    console.log("上传成功:", res);
+                    alert("上传完成");
+                }
+            };
+
+            const config = {
+                useCdnDomain: true,
+                region: qiniu.region.z2 // 注意根据你的 bucket 区域修改
+            };
+
+            const putExtra = {
+                fname: file.name,
+                mimeType: null
+            };
+
+            const key = `test/${Date.now()}-${file.name}`;
+
+            const observable = qiniu.upload(file, key, token, putExtra, config);
+            observable.subscribe(observer);
+        }
+    </script>
+</body>
+</html>
