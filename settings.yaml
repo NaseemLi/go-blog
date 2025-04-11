@@ -26,14 +26,6 @@ jwt:
   expire: 3
   secret: xxx
   issuer: naseem
-upload:
-  size: 3
-  whiteList:
-  - jpg
-  - jpeg
-  - png
-  - gif
-  uploadDir: images001
 redis:
   addr: 127.0.0.1:6379
   password: ""
@@ -55,7 +47,7 @@ site:
     qqLogin: false
     usernamePwdLogin: false
     emailLogin: false
-    captcha: false
+    captcha: true
   indexRight:
     list: []
   article:
@@ -70,9 +62,9 @@ site:
 email:
   domain: smtp.qq.com
   port: 587
-  sendEmail: "635220481@qq.com"
-  authCode: "hshujaxozcmzbbgi"
-  sendNickname: "naseem"
+  sendEmail: 635220481@qq.com
+  authCode: hshujaxozcmzbbgi
+  sendNickname: naseem
   ssl: true
   tls: false
 qq:
@@ -81,8 +73,8 @@ qq:
   redirect: "123131"
 qiniu:
   enable: true
-  accessKey: "a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z"
-  secretKey: "iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc"
+  accessKey: a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z
+  secretKey: iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc
   bucket: naseemblog
   uri: http://sugcd359c.hn-bkt.clouddn.com
   region: z2
@@ -94,3 +86,11 @@ ai:
   secretKey: ""
   nickname: ""
   avatar: ""
+upload:
+  size: 3
+  whiteList:
+  - jpg
+  - jpeg
+  - png
+  - gif
+  uploadDir: images001
