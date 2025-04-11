@@ -6,6 +6,7 @@ import (
 	imageapi "goblog/api/image_api"
 	logapi "goblog/api/log_api"
 	siteapi "goblog/api/site_api"
+	userapi "goblog/api/user_api"
 )
 
 type Api struct {
@@ -14,6 +15,7 @@ type Api struct {
 	ImageApi  imageapi.ImageApi
 	BannerApi bannerapi.BannerApi
 	Captcha   captchaapi.CaptchaApi
+	UserApi   userapi.UserApi
 }
 
 var App = Api{}
