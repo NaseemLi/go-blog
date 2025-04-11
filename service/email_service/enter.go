@@ -29,7 +29,7 @@ func SendEmail(to, subject, text string) (err error) {
 	e.Subject = subject
 	e.Text = []byte(text)
 	err1 := e.Send(fmt.Sprintf("%s:%d", em.Domain, em.Port), smtp.PlainAuth("", em.SendEmail, em.AuthCode, em.Domain))
-	if err1 != nil && !strings.Contains(err.Error(), "short response:") {
+	if err1 != nil && !strings.Contains(err1.Error(), "short response:") {
 		return err1
 	}
 	return nil
