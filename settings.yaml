@@ -68,12 +68,12 @@ site:
     bilibili: ""
     github: ""
 email:
-  domain: ""
-  port: 0
-  sendEmail: ""
-  authCode: ""
-  sendNickname: ""
-  ssl: false
+  domain: smtp.qq.com
+  port: 587
+  sendEmail: "635220481@qq.com"
+  authCode: "hshujaxozcmzbbgi"
+  sendNickname: "naseem"
+  ssl: true
   tls: false
 qq:
   appID: "1231231"
