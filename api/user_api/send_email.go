@@ -5,6 +5,7 @@ import (
 	"goblog/global"
 	"goblog/models"
 	emailservice "goblog/service/email_service"
+	emailstore "goblog/utils/email_store"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
@@ -46,6 +47,10 @@ func (UserApi) SendEmailView(c *gin.Context) {
 		return
 	}
 	global.CaptchaStore.Set(id, code)
+	global.EmailVerifyStore.Store(id, emailstore.EmailStoreInfo{
+		Email: cr.Email,
+		Code:  code,
+	})
 	res.OkWithData(SendEmailResponse{
 		EmailID: id,
 	}, c)
