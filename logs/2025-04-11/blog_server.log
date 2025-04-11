@@ -23,3 +23,5 @@
 [2025-04-11 12:57:50] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-11 12:57:50] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
 [2025-04-11 13:01:23] [31m[error][0m captcha_middleware.go:33 goblog/middleware.CaptchaMiddleware 图形验证失败 invalid character '\n' in string literal
+[2025-04-11 14:04:48] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-11 14:04:48] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
