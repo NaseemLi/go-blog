@@ -1,3 +1,5 @@
 [2025-04-12 21:14:24] [31m[fatal][0m init_db.go:21 goblog/core.InitDB 数据库连接失败dial tcp [::1]:3306: connect: connection refused
 [2025-04-12 21:14:48] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-12 21:14:48] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-12 21:47:54] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-12 21:47:54] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!

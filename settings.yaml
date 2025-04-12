@@ -45,8 +45,8 @@ site:
     description: 介绍测试
   login:
     qqLogin: false
-    usernamePwdLogin: false
-    emailLogin: false
+    usernamePwdLogin: true
+    emailLogin: true
     captcha: true
   indexRight:
     list: []
