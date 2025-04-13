@@ -20,3 +20,5 @@ Key: 'CaptchaMiddlewareRequest.captchaCode---CaptchaCode' Error:Field validation
 [2025-04-13 10:58:24] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
 [2025-04-13 11:42:03] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-13 11:42:03] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-13 12:31:52] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-13 12:31:52] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
