@@ -16,4 +16,5 @@ func UserRouter(r *gin.RouterGroup) {
 	r.GET("user/detail", middleware.AuthMiddelware, app.UserDetailView)
 	r.GET("user/base", app.UserBaseInfoView)
 	r.GET("user/login", middleware.AuthMiddelware, app.UserLoginListView)
+	r.PUT("user/password", middleware.AuthMiddelware, app.UpdatePasswordView)
 }
