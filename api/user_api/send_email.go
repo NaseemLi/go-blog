@@ -4,6 +4,7 @@ import (
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
+	"goblog/models/enum"
 	emailservice "goblog/service/email_service"
 	emailstore "goblog/utils/email_store"
 
@@ -28,8 +29,10 @@ func (UserApi) SendEmailView(c *gin.Context) {
 		res.FailWithError(err, c)
 		return
 	}
+
 	code := base64Captcha.RandText(4, "1234567890")
 	id := base64Captcha.RandomId()
+
 	switch cr.Type {
 	case 1:
 		var user models.UserModel
@@ -39,6 +42,15 @@ func (UserApi) SendEmailView(c *gin.Context) {
 		}
 		err = emailservice.SendRegisterCode(cr.Email, code)
 	case 2:
+		var user models.UserModel
+		err = global.DB.Take(&user, "email = ?", cr.Email).Error
+		if err != nil {
+			res.FailWithMsg("该邮箱不存在", c)
+		}
+		//还必须是邮箱注册
+		if user.RegisterSource != enum.RegisterEmailSourceType {
+			res.FailWithMsg("非邮箱注册用户,不能重置密码", c)
+		}
 		err = emailservice.SendResetPwdCode(cr.Email, code)
 	}
 	if err != nil {
@@ -46,11 +58,13 @@ func (UserApi) SendEmailView(c *gin.Context) {
 		res.FailWithMsg("邮件发送失败", c)
 		return
 	}
+
 	global.CaptchaStore.Set(id, code)
 	global.EmailVerifyStore.Store(id, emailstore.EmailStoreInfo{
 		Email: cr.Email,
 		Code:  code,
 	})
+
 	res.OkWithData(SendEmailResponse{
 		EmailID: id,
 	}, c)
