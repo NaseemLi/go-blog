@@ -3,6 +3,7 @@ package userapi
 import (
 	"goblog/common/res"
 	"goblog/global"
+	"goblog/middleware"
 	"goblog/models"
 	userservice "goblog/service/user_service"
 	"goblog/utils/jwts"
@@ -17,18 +18,14 @@ type PwdLoginrequest struct {
 }
 
 func (UserApi) PwdLoginApi(c *gin.Context) {
-	var cr PwdLoginrequest
-	err := c.ShouldBindJSON(&cr)
-	if err != nil {
-		res.FailWithError(err, c)
-		return
-	}
+	cr := middleware.GetBind[PwdLoginrequest](c)
+
 	if !global.Config.Site.Login.UsernamePwdLogin {
 		res.FailWithMsg("站点未启用密码登录", c)
 		return
 	}
 	var user models.UserModel
-	err = global.DB.Take(&user, "(username = ? or email = ?) and password <> ''", cr.Val, cr.Val).Error
+	err := global.DB.Take(&user, "(username = ? or email = ?) and password <> ''", cr.Val, cr.Val).Error
 	if err != nil {
 		res.FailWithMsg("用户名或密码错误", c)
 		return
