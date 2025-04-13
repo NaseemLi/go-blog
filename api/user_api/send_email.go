@@ -14,7 +14,7 @@ import (
 )
 
 type SendEmailRequest struct {
-	Type  int8   `json:"type" binding:"oneof=1 2"` //1.注册 2.重置密码
+	Type  int8   `json:"type" binding:"oneof=1 2 3"` //1.注册 2.重置密码 3.绑定邮箱
 	Email string `json:"email" binding:"required"`
 }
 
@@ -52,7 +52,15 @@ func (UserApi) SendEmailView(c *gin.Context) {
 			res.FailWithMsg("非邮箱注册用户,不能重置密码", c)
 		}
 		err = emailservice.SendResetPwdCode(cr.Email, code)
+	case 3:
+		var user models.UserModel
+		err = global.DB.Take(&user, "email = ?", cr.Email).Error
+		if err == nil {
+			res.FailWithMsg("该邮箱已使用", c)
+		}
+		err = emailservice.SendResetPwdCode(cr.Email, code)
 	}
+
 	if err != nil {
 		logrus.Errorf("邮件发送失败 %s", err)
 		res.FailWithMsg("邮件发送失败", c)
