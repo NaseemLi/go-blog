@@ -6,7 +6,6 @@ import (
 	"goblog/models"
 	"goblog/models/enum"
 	"goblog/utils/jwts"
-	"math"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -32,8 +31,6 @@ func (UserApi) UserDetailView(c *gin.Context) {
 		res.FailWithMsg("用户不存在", c)
 		return
 	}
-	sub := time.Now().Sub(user.CreatedAt)
-	codeAge := int(math.Ceil(sub.Hours() / 24 / 365))
 
 	var data = UserDetailResponse{
 		ID:             user.ID,
@@ -43,7 +40,7 @@ func (UserApi) UserDetailView(c *gin.Context) {
 		Avatar:         user.Avatar,
 		Abstract:       user.Abstract,
 		RegisterSource: user.RegisterSource,
-		CodeAge:        codeAge,
+		CodeAge:        user.GetCodeAge(),
 	}
 	if user.UserConfModel != nil {
 		data.UserConfModel = *user.UserConfModel
