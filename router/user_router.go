@@ -2,6 +2,7 @@ package router
 
 import (
 	"goblog/api"
+	userapi "goblog/api/user_api"
 	"goblog/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ func UserRouter(r *gin.RouterGroup) {
 	r.POST("user/send_email", middleware.CaptchaMiddleware, app.SendEmailView)
 	r.POST("user/email", app.RegisterEmailView)
 	r.POST("user/qq", app.QQLoginView)
-	r.POST("user/login", middleware.CaptchaMiddleware, app.PwdLoginApi)
+	r.POST("user/login", middleware.CaptchaMiddleware, middleware.BindJsonMiddleware[userapi.PwdLoginrequest], app.PwdLoginApi)
 	r.GET("user/detail", middleware.AuthMiddelware, app.UserDetailView)
 	r.GET("user/base", app.UserBaseInfoView)
 	r.GET("user/login", middleware.AuthMiddelware, app.UserLoginListView)
