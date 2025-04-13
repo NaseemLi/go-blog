@@ -11,13 +11,19 @@ import (
 
 func SendRegisterCode(to string, code string) error {
 	subject := "账号注册"
-	text := fmt.Sprintf("你正在进行账号注册,这是你的验证码%s,10分钟内有效", code)
+	text := fmt.Sprintf("你正在进行账号注册,这是你的验证码 %s,10分钟内有效", code)
 	return SendEmail(to, subject, text)
 }
 
 func SendResetPwdCode(to string, code string) error {
 	subject := "密码重置"
-	text := fmt.Sprintf("你正在进行账号密码重置,这是你的验证码%s,10分钟内有效", code)
+	text := fmt.Sprintf("你正在进行账号密码重置,这是你的验证码 %s,10分钟内有效", code)
+	return SendEmail(to, subject, text)
+}
+
+func SendBindEmailCode(to string, code string) error {
+	subject := "邮箱绑定"
+	text := fmt.Sprintf("你正在进行邮箱绑定,这是你的验证码 %s,10分钟内有效", code)
 	return SendEmail(to, subject, text)
 }
 
