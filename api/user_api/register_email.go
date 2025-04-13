@@ -30,6 +30,11 @@ func (UserApi) RegisterEmailView(c *gin.Context) {
 		return
 	}
 
+	if !global.Config.Site.Login.EmailLogin {
+		res.FailWithMsg("站点未启用邮箱登录", c)
+		return
+	}
+
 	value, ok := global.EmailVerifyStore.Load(cr.EmailID)
 	if !ok {
 		res.FailWithMsg("邮箱验证失败", c)
@@ -45,6 +50,7 @@ func (UserApi) RegisterEmailView(c *gin.Context) {
 		res.FailWithMsg("邮箱验证失败", c)
 		return
 	}
+
 	//创建用户
 	uname := base64Captcha.RandText(5, "1234567890")
 	hashPwd, _ := pwd.GenerateFromPassword(cr.Pwd)
