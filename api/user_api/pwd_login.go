@@ -4,6 +4,7 @@ import (
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
+	userservice "goblog/service/user_service"
 	"goblog/utils/jwts"
 	"goblog/utils/pwd"
 
@@ -43,6 +44,8 @@ func (UserApi) PwdLoginApi(c *gin.Context) {
 		Username: user.Username,
 		Role:     user.Role,
 	})
+
+	userservice.NewUserService(user).UserLogin(c)
 
 	res.OkWithData(token, c)
 }

@@ -6,6 +6,7 @@ import (
 	"goblog/global"
 	"goblog/models"
 	"goblog/models/enum"
+	userservice "goblog/service/user_service"
 	emailstore "goblog/utils/email_store"
 	"goblog/utils/jwts"
 	"goblog/utils/pwd"
@@ -72,6 +73,7 @@ func (UserApi) RegisterEmailView(c *gin.Context) {
 		res.FailWithMsg("邮箱登录失败", c)
 		return
 	}
-	res.OkWithData(token, c)
 
+	userservice.NewUserService(user).UserLogin(c)
+	res.OkWithData(token, c)
 }

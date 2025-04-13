@@ -3,3 +3,20 @@
 [2025-04-13 10:16:33] [36m[info][0m flag_db.go:32 goblog/flags.FlagDB 数据库迁移成功!
 [2025-04-13 10:18:17] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
 [2025-04-13 10:18:17] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-13 10:44:59] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-13 10:44:59] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-13 10:45:00] [36m[info][0m flag_db.go:32 goblog/flags.FlagDB 数据库迁移成功!
+[2025-04-13 10:45:14] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-13 10:45:14] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-13 10:45:49] [31m[error][0m captcha_middleware.go:33 goblog/middleware.CaptchaMiddleware 图形验证失败 Key: 'CaptchaMiddlewareRequest.captchaID---CaptchaID' Error:Field validation for 'captchaID---CaptchaID' failed on the 'required' tag
+Key: 'CaptchaMiddlewareRequest.captchaCode---CaptchaCode' Error:Field validation for 'captchaCode---CaptchaCode' failed on the 'required' tag
+[2025-04-13 10:47:24] [31m[error][0m captcha_middleware.go:33 goblog/middleware.CaptchaMiddleware 图形验证失败 Key: 'CaptchaMiddlewareRequest.captchaID---CaptchaID' Error:Field validation for 'captchaID---CaptchaID' failed on the 'required' tag
+Key: 'CaptchaMiddlewareRequest.captchaCode---CaptchaCode' Error:Field validation for 'captchaCode---CaptchaCode' failed on the 'required' tag
+[2025-04-13 10:47:34] [31m[error][0m captcha_middleware.go:33 goblog/middleware.CaptchaMiddleware 图形验证失败 Key: 'CaptchaMiddlewareRequest.captchaID---CaptchaID' Error:Field validation for 'captchaID---CaptchaID' failed on the 'required' tag
+Key: 'CaptchaMiddlewareRequest.captchaCode---CaptchaCode' Error:Field validation for 'captchaCode---CaptchaCode' failed on the 'required' tag
+[2025-04-13 10:47:35] [31m[error][0m captcha_middleware.go:33 goblog/middleware.CaptchaMiddleware 图形验证失败 Key: 'CaptchaMiddlewareRequest.captchaID---CaptchaID' Error:Field validation for 'captchaID---CaptchaID' failed on the 'required' tag
+Key: 'CaptchaMiddlewareRequest.captchaCode---CaptchaCode' Error:Field validation for 'captchaCode---CaptchaCode' failed on the 'required' tag
+[2025-04-13 10:58:24] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-13 10:58:24] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!
+[2025-04-13 11:42:03] [36m[info][0m init_db.go:28 goblog/core.InitDB 数据库连接成功!
+[2025-04-13 11:42:03] [36m[info][0m init_redis.go:20 goblog/core.InitRedis redis连接成功!

@@ -44,10 +44,10 @@ site:
     keywords: 关键词测试
     description: 介绍测试
   login:
-    qqLogin: false
+    qqLogin: true
     usernamePwdLogin: true
     emailLogin: true
-    captcha: true
+    captcha: false
   indexRight:
     list: []
   article:
