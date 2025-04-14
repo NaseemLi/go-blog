@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"goblog/global"
 	"time"
 
@@ -20,7 +19,6 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		logrus.Fatalf("数据库连接失败%s", err)
 	}
-	fmt.Println(db, err)
 	sqlDB, err := db.DB()
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
