@@ -7,32 +7,49 @@ log:
   app: blog_server
   dir: ""
 db:
-  user: remote
-  password: YOUR_PASSWORD
-  host: YOUR_SERVER_IP
-  port: 3307
-  db: blog
-  debug: false
-  source: mysql
-db1:
-  user: remote
-  password: YOUR_PASSWORD
-  host: YOUR_SERVER_IP
-  port: 3306
-  db: blog
-  debug: false
-  source: mysql
+  - user: remote
+    password: YOUR_PASSWORD
+    host: YOUR_SERVER_IP
+    port: 3306
+    db: blog
+    debug: false
+    source: mysql
+  - user: remote
+    password: YOUR_PASSWORD
+    host: YOUR_SERVER_IP
+    port: 3307
+    db: blog
+    debug: false
+    source: mysql
 es:
-  url: http://YOUR_SERVER_IP:9200
+  addr: YOUR_SERVER_IP:9200
+  is_https:
   username: elastic
   password: YOUR_PASSWORD
+river:
+  enable: true
+  server_id: 1001
+  flavor: mysql
+  data_dir: ./var
+  source:
+    - schema: blog
+      tables:
+        - article_models
+  rule:
+    - schema: blog
+      table: article_models
+      index: article_index
+      type: _doc
+      field:
+        tag_list: tag_list,list
+  bulk_size: 128
 jwt:
   expire: 3
   secret: xxx
   issuer: naseem
 redis:
-  addr: 127.0.0.1:6379
-  password: ""
+  addr: YOUR_SERVER_IP:6379
+  password: YOUR_PASSWORD
   db: 2
 site:
   siteInfo:

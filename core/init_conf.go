@@ -21,8 +21,7 @@ func ReadConf() (c *conf.Config) {
 	if err != nil {
 		panic(fmt.Sprintf("yaml配置文件格式错误%s", err))
 	}
-	fmt.Printf("读取配置文件%s成功\n", flags.FlagOptions.File)
-
+	fmt.Printf("读取配置文件%s成功!\n", flags.FlagOptions.File)
 	return
 }
 
