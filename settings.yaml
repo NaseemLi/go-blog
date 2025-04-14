@@ -7,21 +7,21 @@ log:
   app: blog_server
   dir: ""
 db:
-  user: root
-  password: "123456"
-  host: localhost
-  port: 3306
+  user: remote
+  password: 5Bs7)qg}6Q
+  host: 47.79.84.19
+  port: 3307
   db: blog
   debug: false
   source: mysql
 db1:
-  user: ""
-  password: ""
-  host: ""
-  port: 0
-  db: ""
+  user: remote
+  password: 5Bs7)qg}6Q
+  host: 47.79.84.19
+  port: 3306
+  db: blog
   debug: false
-  source: ""
+  source: mysql
 jwt:
   expire: 3
   secret: xxx
