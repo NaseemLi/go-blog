@@ -22,6 +22,10 @@ db1:
   db: blog
   debug: false
   source: mysql
+es:
+  url: http://47.79.84.19:9200
+  username: elastic
+  password: 5Bs7)qg}6Q
 jwt:
   expire: 3
   secret: xxx

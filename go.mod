@@ -23,7 +23,16 @@ require (
 
 require github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 
-require golang.org/x/term v0.31.0
+require (
+	github.com/olivere/elastic v6.2.37+incompatible
+	github.com/olivere/elastic/v7 v7.0.32
+	golang.org/x/term v0.31.0
+)
+
+require (
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
+)
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
