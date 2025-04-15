@@ -1,0 +1,117 @@
+system:
+  ip: ""
+  port: 8080
+  gin_mode: debug
+  env: dev
+log:
+  app: blog_server
+  dir: ""
+db:
+  - user: remote
+    password: YOUR_PASSWORD
+    host: YOUR_SERVER_IP
+    port: 3306
+    db: blog
+    debug: false
+    source: mysql
+  - user: remote
+    password: YOUR_PASSWORD
+    host: YOUR_SERVER_IP
+    port: 3307
+    db: blog
+    debug: false
+    source: mysql
+es:
+  addr: YOUR_SERVER_IP:9200
+  is_https:
+  username: elastic
+  password: YOUR_PASSWORD
+river:
+  enable: true
+  server_id: 1001
+  flavor: mysql
+  data_dir: ./var
+  source:
+    - schema: blog
+      tables:
+        - article_models
+  rule:
+    - schema: blog
+      table: article_models
+      index: article_index
+      type: _doc
+      field:
+        tag_list: tag_list,list
+  bulk_size: 128
+jwt:
+  expire: 3
+  secret: xxx
+  issuer: naseem
+redis:
+  addr: YOUR_SERVER_IP:6379
+  password: YOUR_PASSWORD
+  db: 2
+site:
+  siteInfo:
+    title: test1
+    log: ""
+    beian: ""
+    mode: 1
+  project:
+    title: golang-blog
+    icon: /xxx.png
+    webPath: uploads/index.html
+  seo:
+    keywords: 关键词测试
+    description: 介绍测试
+  login:
+    qqLogin: true
+    usernamePwdLogin: true
+    emailLogin: true
+    captcha: false
+  indexRight:
+    list: []
+  article:
+    noExamine: false
+  about:
+    siteDate: "1"
+    qq: "635220481"
+    wechat: N4seem
+    gitee: ""
+    bilibili: ""
+    github: ""
+email:
+  domain: smtp.qq.com
+  port: 587
+  sendEmail: 635220481@qq.com
+  authCode: YOUR_AUTH_CODE
+  sendNickname: naseem
+  ssl: true
+  tls: false
+qq:
+  appID: "1231231"
+  appKey: '*******'
+  redirect: "123131"
+qiniu:
+  enable: true
+  accessKey: a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z
+  secretKey: iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc
+  bucket: naseemblog
+  uri: http://sugcd359c.hn-bkt.clouddn.com
+  region: z2
+  prefix: blog
+  size: 3
+  expiry: 60
+ai:
+  enable: false
+  secretKey: ""
+  nickname: ""
+  avatar: ""
+upload:
+  size: 3
+  whiteList:
+  - jpg
+  - jpeg
+  - png
+  - gif
+  uploadDir: images001
