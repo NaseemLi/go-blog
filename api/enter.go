@@ -1,6 +1,7 @@
 package api
 
 import (
+	articleapi "goblog/api/article_api"
 	bannerapi "goblog/api/banner_api"
 	captchaapi "goblog/api/captcha_api"
 	imageapi "goblog/api/image_api"
@@ -10,12 +11,13 @@ import (
 )
 
 type Api struct {
-	Siteapi   siteapi.Siteapi
-	LogApi    logapi.LogApi
-	ImageApi  imageapi.ImageApi
-	BannerApi bannerapi.BannerApi
-	Captcha   captchaapi.CaptchaApi
-	UserApi   userapi.UserApi
+	Siteapi    siteapi.Siteapi
+	LogApi     logapi.LogApi
+	ImageApi   imageapi.ImageApi
+	BannerApi  bannerapi.BannerApi
+	Captcha    captchaapi.CaptchaApi
+	UserApi    userapi.UserApi
+	ArticleApi articleapi.ArticleApi
 }
 
 var App = Api{}
