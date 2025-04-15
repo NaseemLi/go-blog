@@ -2,7 +2,6 @@ package articleapi
 
 import (
 	"bytes"
-	"fmt"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/middleware"
@@ -46,6 +45,16 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 	}
 
 	//文章正文防 xss 注入
+	contentDoc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(cr.Content)))
+	if err != nil {
+		res.FailWithMsg("正文解析错误", c)
+		return
+	}
+	contentDoc.Find("script").Remove()
+	contentDoc.Find("img").Remove()
+	contentDoc.Find("iframe").Remove()
+
+	cr.Content = contentDoc.Text()
 
 	//如果不传简介,从正文中取前面的字符
 	if cr.Abstract == "" {
@@ -54,7 +63,7 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 
 		doc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(html)))
 		if err != nil {
-			fmt.Println(err)
+			res.FailWithMsg("正文解析错误", c)
 			return
 		}
 
