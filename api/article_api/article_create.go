@@ -1,7 +1,6 @@
 package articleapi
 
 import (
-	"bytes"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/middleware"
@@ -10,8 +9,8 @@ import (
 	"goblog/models/enum"
 	"goblog/utils/jwts"
 	"goblog/utils/markdown"
+	"goblog/utils/xss"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
 )
 
@@ -44,36 +43,17 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 		}
 	}
 
-	//文章正文防 xss 注入
-	contentDoc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(cr.Content)))
-	if err != nil {
-		res.FailWithMsg("正文解析错误", c)
-		return
-	}
-	contentDoc.Find("script").Remove()
-	contentDoc.Find("img").Remove()
-	contentDoc.Find("iframe").Remove()
+	// 文章正文防xss注入
+	cr.Content = xss.XSSFilter(cr.Content)
 
-	cr.Content = contentDoc.Text()
-
-	//如果不传简介,从正文中取前面的字符
+	// 如果不传简介，那么从正文中取前30个字符
 	if cr.Abstract == "" {
-		//把 markdown 转为 html,再取文本
-		html := markdown.MdToHTML(cr.Content)
-
-		doc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(html)))
-		if err != nil {
+		abs, err1 := markdown.ExtractContent(cr.Content, 100)
+		if err1 != nil {
 			res.FailWithMsg("正文解析错误", c)
 			return
 		}
-
-		htmlText := doc.Text()
-		runes := []rune(htmlText)
-		if len(runes) > 200 {
-			cr.Abstract = string(runes[:200])
-		} else {
-			cr.Abstract = string(runes)
-		}
+		cr.Abstract = abs
 	}
 
 	//正文内容图片转存
