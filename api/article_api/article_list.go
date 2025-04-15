@@ -1,12 +1,17 @@
 package articleapi
 
+// ?逻辑
 import (
+	"fmt"
 	"goblog/common"
 	"goblog/common/res"
+	"goblog/global"
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
 	"goblog/utils/jwts"
+	"goblog/utils/sql"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,9 +33,21 @@ type ArticleListResponse struct {
 func (ArticleApi) ArticleListView(c *gin.Context) {
 	cr := middleware.GetBind[ArticleListRequest](c)
 
+	var topArticleIDList []uint
+
+	var orderColumnMap = map[string]bool{
+		"look_count desc":    true,
+		"digg_count desc":    true,
+		"comment_count desc": true,
+		"collect_count desc": true,
+		"look_count asc":     true,
+		"digg_count asc":     true,
+		"comment_count asc":  true,
+		"collect_count asc":  true,
+	}
+
 	switch cr.Type {
 	case 1:
-		//查别人用户 ID 必填
 		if cr.UserID == 0 {
 			res.FailWithMsg("用户ID必填", c)
 			return
@@ -40,8 +57,8 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 			return
 		}
 		cr.Status = 0
+		cr.Order = ""
 	case 2:
-		//查自己
 		claims, err := jwts.ParseTokenByGin(c)
 		if err != nil {
 			res.FailWithMsg("请登录", c)
@@ -55,20 +72,66 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 			return
 		}
 	}
+
+	if cr.Order != "" {
+		_, ok := orderColumnMap[cr.Order]
+		if !ok {
+			res.FailWithMsg("不支持的排序方式", c)
+			return
+		}
+	}
+
+	var userTopMap = map[uint]bool{}
+	var AdminTopMap = map[uint]bool{}
+
+	if cr.UserID != 0 {
+		var UserTopArticleList []models.UserTopArticleModel
+		result := global.DB.Preload("UserModel").Order("created_at desc").Find(&UserTopArticleList, "user_id = ?", cr.UserID)
+
+		if result.Error != nil {
+			log.Printf("查询用户置顶文章失败: %v", result.Error)
+			return
+		}
+
+		for _, i2 := range UserTopArticleList {
+			topArticleIDList = append(topArticleIDList, i2.ArticleID)
+
+			if i2.UserModel.ID != 0 && i2.UserModel.Role == enum.AdminRole {
+				AdminTopMap[i2.ArticleID] = true
+			}
+			userTopMap[i2.ArticleID] = true
+		}
+	}
+
+	var options = common.Options{
+		Likes:    []string{"title"},
+		PageInfo: cr.PageInfo,
+	}
+
+	if cr.Order != "" {
+		// 用户指定排序字段优先
+		options.DefaultOrder = fmt.Sprintf("%s, created_at desc", cr.Order)
+	} else if len(topArticleIDList) > 0 {
+		// 用户或管理员有置顶文章时按 FIELD 排序
+		options.DefaultOrder = fmt.Sprintf("%s, created_at desc", sql.ConvertSliceOrderSql(topArticleIDList))
+	} else {
+		// 默认排序
+		options.DefaultOrder = "created_at desc"
+	}
+
 	_list, count, _ := common.ListQuery(models.ArticleModel{
 		UserID:     cr.UserID,
 		CategoryID: cr.CategoryID,
 		Status:     enum.ArticleStatusType(cr.Status),
-	}, common.Options{
-		Likes:    []string{"title"},
-		PageInfo: cr.PageInfo,
-	})
+	}, options)
 
 	var list = make([]ArticleListResponse, 0)
 	for _, model := range _list {
 		model.Content = ""
 		list = append(list, ArticleListResponse{
 			ArticleModel: model,
+			UserTop:      userTopMap[model.ID],
+			AdminTop:     AdminTopMap[model.ID],
 		})
 	}
 
