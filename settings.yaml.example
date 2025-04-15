@@ -3,29 +3,33 @@ system:
   port: 8080
   gin_mode: debug
   env: dev
+
 log:
   app: blog_server
   dir: ""
+
 db:
-  - user: remote
-    password: 5Bs7)qg}6Q
-    host: 47.79.84.19
+  - user: your_db_user
+    password: your_db_password
+    host: your_db_host
     port: 3306
     db: blog
     debug: false
     source: mysql
-  - user: remote
-    password: 5Bs7)qg}6Q
-    host: 47.79.84.19
+  - user: your_db_user
+    password: your_db_password
+    host: your_db_host
     port: 3307
     db: blog
     debug: false
     source: mysql
+
 es:
-  addr: 47.79.84.19:9200
+  addr: your_es_host:9200
   is_https:
-  username: elastic
-  password: 5Bs7)qg}6Q
+  username: your_es_username
+  password: your_es_password
+
 river:
   enable: true
   server_id: 1001
@@ -43,17 +47,20 @@ river:
       field:
         tag_list: tag_list,list
   bulk_size: 128
+
 jwt:
   expire: 3
-  secret: xxx
-  issuer: naseem
+  secret: your_jwt_secret
+  issuer: your_issuer_name
+
 redis:
-  addr: 47.79.84.19:6379
-  password: 5Bs7)qg}6Q
+  addr: your_redis_host:6379
+  password: your_redis_password
   db: 2
+
 site:
   siteInfo:
-    title: test1
+    title: your_site_title
     log: ""
     beian: ""
     mode: 1
@@ -62,8 +69,8 @@ site:
     icon: /xxx.png
     webPath: uploads/index.html
   seo:
-    keywords: 关键词测试
-    description: 介绍测试
+    keywords: your_keywords
+    description: your_description
   login:
     qqLogin: true
     usernamePwdLogin: true
@@ -75,43 +82,48 @@ site:
     noExamine: false
   about:
     siteDate: "1"
-    qq: "635220481"
-    wechat: N4seem
+    qq: your_qq
+    wechat: your_wechat
     gitee: ""
     bilibili: ""
     github: ""
+
 email:
-  domain: smtp.qq.com
+  domain: smtp.yourdomain.com
   port: 587
-  sendEmail: 635220481@qq.com
-  authCode: hshujaxozcmzbbgi
-  sendNickname: naseem
+  sendEmail: your_email@example.com
+  authCode: your_email_auth_code
+  sendNickname: your_nickname
   ssl: true
   tls: false
+
 qq:
-  appID: "1231231"
-  appKey: '*******'
-  redirect: "123131"
+  appID: your_qq_app_id
+  appKey: your_qq_app_key
+  redirect: your_redirect_url
+
 qiniu:
   enable: true
-  accessKey: a1HaquccaTMHU_5IjZWQFCkQSdCDGhzJSGghRI8Z
-  secretKey: iQV2LLT7_73INLavNm4lqgwAIF3UDpYDgwO0BTNc
-  bucket: naseemblog
-  uri: http://sugcd359c.hn-bkt.clouddn.com
+  accessKey: your_qiniu_access_key
+  secretKey: your_qiniu_secret_key
+  bucket: your_bucket_name
+  uri: http://your-cdn-url
   region: z2
   prefix: blog
   size: 3
   expiry: 60
+
 ai:
   enable: false
-  secretKey: ""
-  nickname: ""
+  secretKey: your_ai_key
+  nickname: your_ai_nickname
   avatar: ""
+
 upload:
   size: 3
   whiteList:
-  - jpg
-  - jpeg
-  - png
-  - gif
+    - jpg
+    - jpeg
+    - png
+    - gif
   uploadDir: images001
