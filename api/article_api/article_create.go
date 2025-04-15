@@ -16,14 +16,14 @@ import (
 )
 
 type ArticleCreateRequest struct {
-	Title       string                 `json:"title" binding:"required"`
-	Abstract    string                 `json:"abstract"`
-	Content     string                 `json:"content" binding:"required"`
-	CategoryID  *uint                  `json:"categoryID"`
-	TagList     ctype.List             `json:"tagList"`
-	Cover       string                 `json:"cover"`
-	OpenComment bool                   `json:"openComment"`
-	Status      enum.ArticleStatusType `json:"status" binding:"required,oneof = 1 2"`
+	Title       string     `json:"title" binding:"required"`
+	Abstract    string     `json:"abstract"`
+	Content     string     `json:"content" binding:"required"`
+	CategoryID  *uint      `json:"categoryID"`
+	TagList     ctype.List `json:"tagList"`
+	Cover       string     `json:"cover"`
+	OpenComment bool       `json:"openComment"`
+	Status      int        `json:"status" binding:"required,oneof=1 2"`
 }
 
 func (ArticleApi) ArticleCreateView(c *gin.Context) {
@@ -39,7 +39,7 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 	if cr.CategoryID != nil {
 		err = global.DB.Take(&category, "id = ? and user_id = ?", &cr.CategoryID, user.ID).Error
 		if err != nil {
-			res.FailWithMsg("文章不存在", c)
+			res.FailWithMsg("文章分类不存在", c)
 			return
 		}
 	}
@@ -68,10 +68,11 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 		}
 
 		htmlText := doc.Text()
-		cr.Abstract = htmlText
-		if len(htmlText) > 200 {
-			//如果大于 200 就取前 200
-			cr.Abstract = string([]rune(htmlText)[:200])
+		runes := []rune(htmlText)
+		if len(runes) > 200 {
+			cr.Abstract = string(runes[:200])
+		} else {
+			cr.Abstract = string(runes)
 		}
 	}
 
@@ -87,9 +88,10 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 		Cover:       cr.Cover,
 		OpenComment: cr.OpenComment,
 		CategoryID:  cr.CategoryID,
-		Status:      cr.Status,
+		Status:      enum.ArticleStatusType(cr.Status), // 显式转换成你定义的枚举类型
 	}
-	if global.Config.Site.Article.NoExamine {
+	//免审核
+	if cr.Status == int(enum.ArticleStatusExamine) && global.Config.Site.Article.NoExamine {
 		article.Status = enum.ArticleStatusPublished
 	}
 	err = global.DB.Create(&article).Error
