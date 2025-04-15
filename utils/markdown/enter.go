@@ -1,6 +1,9 @@
 package markdown
 
 import (
+	"bytes"
+
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
@@ -18,4 +21,20 @@ func MdToHTML(md string) string {
 	renderer := html.NewRenderer(opts)
 
 	return string(markdown.Render(doc, renderer))
+}
+
+func ExtractContent(content string, length int) (abs string, err error) {
+	// 把markdown转成html，再取文本
+	html := MdToHTML(content)
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(html)))
+	if err != nil {
+		return
+	}
+	htmlText := doc.Text()
+	abs = htmlText
+	if len(htmlText) > length {
+		// 如果大于200，就取前200
+		abs = string([]rune(htmlText)[:length])
+	}
+	return
 }
