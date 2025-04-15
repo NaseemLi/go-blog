@@ -1,6 +1,8 @@
 package articleapi
 
 import (
+	"bytes"
+	"fmt"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/middleware"
@@ -8,7 +10,9 @@ import (
 	"goblog/models/ctype"
 	"goblog/models/enum"
 	"goblog/utils/jwts"
+	"goblog/utils/markdown"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,8 +36,35 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 	}
 
 	//判断分类 ID 是不是自己创建的
+	var category models.CategoryModel
+	if cr.CategoryID != nil {
+		err = global.DB.Take(&category, "id = ? and user_id = ?", &cr.CategoryID, user.ID).Error
+		if err != nil {
+			res.FailWithMsg("文章不存在", c)
+			return
+		}
+	}
 
 	//文章正文防 xss 注入
+
+	//如果不传简介,从正文中取前面的字符
+	if cr.Abstract == "" {
+		//把 markdown 转为 html,再取文本
+		html := markdown.MdToHTML(cr.Content)
+
+		doc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(html)))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		htmlText := doc.Text()
+		cr.Abstract = htmlText
+		if len(htmlText) > 200 {
+			//如果大于 200 就取前 200
+			cr.Abstract = string([]rune(htmlText)[:200])
+		}
+	}
 
 	//正文内容图片转存
 
