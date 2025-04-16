@@ -6,6 +6,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 	"time"
 
@@ -58,6 +59,6 @@ func (ArticleApi) ArticleLookView(c *gin.Context) {
 		res.FailWithMsg("失败", c)
 		return
 	}
-
+	redisarticle.SetCacheLook(cr.ArticleID, true)
 	res.OkWithMsg("成功", c)
 }
