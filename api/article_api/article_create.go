@@ -33,6 +33,13 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 		res.FailWithMsg("用户不存在", c)
 	}
 
+	if global.Config.Site.SiteInfo.Mode == 2 {
+		if user.Role != enum.AdminRole {
+			res.FailWithMsg("博客模式下，普通用户不能更新文章", c)
+			return
+		}
+	}
+
 	//判断分类 ID 是不是自己创建的
 	var category models.CategoryModel
 	if cr.CategoryID != nil {
