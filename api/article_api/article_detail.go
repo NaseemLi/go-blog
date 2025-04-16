@@ -6,6 +6,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -52,7 +53,15 @@ func (ArticleApi) ArticleDetailView(c *gin.Context) {
 			}
 		}
 	}
-	//todo 从缓存获取浏览量和点赞数
+
+	lookCount := redisarticle.GetCacheLook(article.ID)
+	diggCount := redisarticle.GetCacheDigg(article.ID)
+	collectCount := redisarticle.GetCacheCollect(article.ID)
+
+	article.DiggCount = article.DiggCount + diggCount
+	article.CollectCount = article.CollectCount + collectCount
+	article.LookCount = article.LookCount + lookCount
+
 	res.OkWithData(ArticleDetailResponse{
 		ArticleModel: article,
 		Username:     article.UserModel.Username,

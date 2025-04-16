@@ -9,6 +9,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 	"goblog/utils/sql"
 	"log"
@@ -126,8 +127,16 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 	}, options)
 
 	var list = make([]ArticleListResponse, 0)
+	collectMap := redisarticle.GetAllCacheCollect()
+	diggMap := redisarticle.GetAllCacheDigg()
+	lookMap := redisarticle.GetAllCacheLook()
+
 	for _, model := range _list {
 		model.Content = ""
+		model.DiggCount = model.DiggCount + diggMap[model.ID]
+		model.CollectCount = model.CollectCount + collectMap[model.ID]
+		model.LookCount = model.LookCount + lookMap[model.ID]
+
 		list = append(list, ArticleListResponse{
 			ArticleModel: model,
 			UserTop:      userTopMap[model.ID],
