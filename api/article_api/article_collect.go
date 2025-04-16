@@ -6,6 +6,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,7 @@ func (ArticleApi) ArticleCollectView(c *gin.Context) {
 		res.OkWithMsg("收藏成功", c)
 
 		// 对收藏夹进行加1
+		redisarticle.SetCacheCollect(cr.CollectID, true)
 		global.DB.Model(&collectModel).Update("article_count", gorm.Expr("article_count + 1"))
 		return
 	}
@@ -86,5 +88,6 @@ func (ArticleApi) ArticleCollectView(c *gin.Context) {
 	}
 	res.OkWithMsg("取消收藏成功", c)
 	//TODO:收藏数同步缓存
+	redisarticle.SetCacheCollect(cr.CollectID, false)
 	global.DB.Model(&collectModel).Update("article_count", gorm.Expr("article_count - 1"))
 }
