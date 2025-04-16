@@ -5,6 +5,7 @@ import (
 	"goblog/flags"
 	"goblog/global"
 	"goblog/router"
+	cronservice "goblog/service/cron_service"
 )
 
 func main() {
@@ -18,6 +19,10 @@ func main() {
 	flags.Run()
 
 	core.InitMysqlSE()
+
+	//定时任务
+	cronservice.Cron()
+
 	//启动 web 程序
 	router.Run()
 }

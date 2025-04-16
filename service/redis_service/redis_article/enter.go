@@ -78,11 +78,20 @@ func GetAll(t articleCacheType) (mps map[uint]int) {
 func GetAllCacheLook() (mps map[uint]int) {
 	return GetAll(articleCacheLook)
 }
+
 func GetAllCacheDigg() (mps map[uint]int) {
 	return GetAll(articleCacheDigg)
 }
+
 func GetAllCacheCollect() (mps map[uint]int) {
 	return GetAll(articleCacheCollect)
+}
+
+func Clear() {
+	err := global.Redis.Del("article_look_key", "article_digg_key", "article_collect_key")
+	if err != nil {
+		logrus.Error(err)
+	}
 }
 
 func SetUserArticleHistoryCache(articleID, userID uint) {

@@ -42,6 +42,7 @@ require (
 	github.com/pingcap/log v1.1.1-0.20230317032135-a0d097d16e22 // indirect
 	github.com/pingcap/parser v0.0.0-20190506092653-e336082eb825 // indirect
 	github.com/pingcap/tipb v0.0.0-20190428032612-535e1abaa330 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
