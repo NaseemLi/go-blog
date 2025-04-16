@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type ArticleLookRequest struct {
@@ -30,7 +31,11 @@ func (ArticleApi) ArticleLookView(c *gin.Context) {
 
 	// 引入缓存
 	// 当天这个用户请求这个文章之后，将用户id和文章id作为key存入缓存，在这里进行判断，如果存在就直接返回
-
+	if redisarticle.GetUserArticleHistoryCache(cr.ArticleID, claims.UserID) {
+		logrus.Info("在缓存内")
+		res.OkWithMsg("成功", c)
+		return
+	}
 	var article models.ArticleModel
 	err = global.DB.Take(&article, "status = ? and id = ?", enum.ArticleStatusPublished, cr.ArticleID).Error
 	if err != nil {
@@ -60,5 +65,6 @@ func (ArticleApi) ArticleLookView(c *gin.Context) {
 		return
 	}
 	redisarticle.SetCacheLook(cr.ArticleID, true)
+	redisarticle.SetUserArticleHistoryCache(cr.ArticleID, claims.UserID)
 	res.OkWithMsg("成功", c)
 }

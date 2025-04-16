@@ -1,8 +1,12 @@
 package redisarticle
 
 import (
+	"fmt"
 	"goblog/global"
+	"goblog/utils/date"
 	"strconv"
+
+	"github.com/sirupsen/logrus"
 )
 
 type articleCacheType string
@@ -14,13 +18,11 @@ const (
 )
 
 func set(t articleCacheType, articleID uint, increase bool) {
-	num, _ := global.Redis.HGet(string(t), strconv.Itoa(int(articleID))).Int()
-	if increase {
-		num++
-	} else {
-		num--
+	delta := int64(1)
+	if !increase {
+		delta = -1
 	}
-	global.Redis.HSet(string(t), strconv.Itoa(int(articleID)), num)
+	global.Redis.HIncrBy(string(t), strconv.Itoa(int(articleID)), delta)
 }
 
 func SetCacheLook(articleID uint, increase bool) {
@@ -81,4 +83,33 @@ func GetAllCacheDigg() (mps map[uint]int) {
 }
 func GetAllCacheCollect() (mps map[uint]int) {
 	return GetAll(articleCacheCollect)
+}
+
+func SetUserArticleHistoryCache(articleID, userID uint) {
+	key := fmt.Sprintf("history_%d", userID)
+	field := fmt.Sprintf("%d", articleID)
+
+	endTime := date.GetNowAfter()
+
+	err := global.Redis.HSet(key, field, "").Err()
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+	err = global.Redis.ExpireAt(key, endTime).Err()
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+}
+
+func GetUserArticleHistoryCache(articleID, userID uint) (ok bool) {
+	key := fmt.Sprintf("history_%d", userID)
+	field := fmt.Sprintf("%d", articleID)
+	err := global.Redis.HGet(key, field).Err()
+	if err != nil {
+		logrus.Error(err)
+		return false
+	}
+	return true
 }
