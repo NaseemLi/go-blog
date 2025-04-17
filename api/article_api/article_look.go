@@ -1,6 +1,7 @@
 package articleapi
 
 import (
+	"fmt"
 	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
@@ -118,4 +119,21 @@ func (ArticleApi) ArticleLookListView(c *gin.Context) {
 	}
 
 	res.OkWithList(list, count, c)
+}
+
+func (ArticleApi) ArticleLookRemoveView(c *gin.Context) {
+	cr := middleware.GetBind[models.RemoveRequest](c)
+
+	claims := jwts.GetClaims(c)
+
+	var list []models.UserArticleLookHistoryModel
+	global.DB.Find(&list, "user_id = ? and id in ?", claims.UserID, cr.IDList)
+	if len(list) == 0 {
+		res.FailWithMsg("没有找到记录", c)
+		return
+	}
+
+	global.DB.Delete(&list)
+
+	res.OkWithMsg(fmt.Sprintf("删除足迹成功,共删除 %d 条", len(list)), c)
 }
