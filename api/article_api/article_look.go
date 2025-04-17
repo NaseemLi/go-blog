@@ -1,6 +1,7 @@
 package articleapi
 
 import (
+	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/middleware"
@@ -67,4 +68,54 @@ func (ArticleApi) ArticleLookView(c *gin.Context) {
 	redisarticle.SetCacheLook(cr.ArticleID, true)
 	redisarticle.SetUserArticleHistoryCache(cr.ArticleID, claims.UserID)
 	res.OkWithMsg("成功", c)
+}
+
+type ArticleLookListRequest struct {
+	common.PageInfo
+	UserID uint `form:"userID"`
+	Type   int8 `form:"type" binding:"required,oneof=1 2"`
+}
+
+type ArticleLookListResponse struct {
+	ID        uint      `json:"id"`
+	LookDate  time.Time `json:"lookDate"`
+	Title     string    `json:"title"`
+	Cover     string    `json:"cover"`
+	Nickname  string    `json:"nickname"`
+	Avatar    string    `json:"avatar"`
+	UserID    uint      `json:"userID"`
+	ArticleID uint      `json:"articleID"`
+}
+
+func (ArticleApi) ArticleLookListView(c *gin.Context) {
+	cr := middleware.GetBind[ArticleLookListRequest](c)
+	claims := jwts.GetClaims(c)
+
+	switch cr.Type {
+	case 1:
+		cr.UserID = claims.UserID
+	}
+
+	_list, count, _ := common.ListQuery(models.UserArticleLookHistoryModel{
+		UserID: cr.UserID,
+	}, common.Options{
+		PageInfo: cr.PageInfo,
+		Preloads: []string{"UserModel", "ArticleModel"},
+	})
+
+	var list = make([]ArticleLookListResponse, 0)
+	for _, model := range _list {
+		list = append(list, ArticleLookListResponse{
+			ID:        model.ID,
+			LookDate:  model.CreatedAt,
+			Title:     model.ArticleModel.Title,
+			Cover:     model.ArticleModel.Cover,
+			Nickname:  model.UserModel.Nickname,
+			Avatar:    model.UserModel.Avatar,
+			UserID:    model.UserModel.ID,
+			ArticleID: model.ArticleID,
+		})
+	}
+
+	res.OkWithList(list, count, c)
 }
