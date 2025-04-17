@@ -26,12 +26,10 @@ func ArticleRouter(r *gin.RouterGroup) {
 	r.DELETE("article/history", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleLookRemoveView)
 
 	r.POST("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
-	r.PUT("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
 	r.GET("category", middleware.BindQueryMiddleware[articleapi.CategoryListRequest], app.CategoryListView)
 	r.DELETE("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CategoryRemoveView)
 	// 收藏夹的接口（收藏夹 CRUD）
 	r.POST("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CollectCreateRequest], app.CollectCreateView)
-	r.PUT("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CollectCreateRequest], app.CollectCreateView)
 	r.GET("collect", middleware.BindQueryMiddleware[articleapi.CollectListRequest], app.CollectListView)
 	r.DELETE("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CollectRemoveView)
 }
