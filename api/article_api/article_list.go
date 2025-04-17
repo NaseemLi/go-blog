@@ -27,8 +27,11 @@ type ArticleListRequest struct {
 
 type ArticleListResponse struct {
 	models.ArticleModel
-	UserTop  bool `json:"userTop"`  //是否为用户置顶
-	AdminTop bool `json:"adminTop"` //是否为管理员置顶
+	UserTop       bool    `json:"userTop"`  //是否为用户置顶
+	AdminTop      bool    `json:"adminTop"` //
+	CategoryTitle *string `json:"categoryTitle"`
+	UserNickname  string  `json:"userNickname"`
+	UserAvatar    string  `json:"userAvatar"`
 }
 
 func (ArticleApi) ArticleListView(c *gin.Context) {
@@ -105,8 +108,10 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 	}
 
 	var options = common.Options{
-		Likes:    []string{"title"},
-		PageInfo: cr.PageInfo,
+		Likes:        []string{"title"},
+		PageInfo:     cr.PageInfo,
+		DefaultOrder: "created_at desc",
+		Preloads:     []string{"UserModel", "CategoryModel"},
 	}
 
 	if cr.Order != "" {
@@ -137,11 +142,19 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		model.CollectCount = model.CollectCount + collectMap[model.ID]
 		model.LookCount = model.LookCount + lookMap[model.ID]
 
-		list = append(list, ArticleListResponse{
+		data := ArticleListResponse{
 			ArticleModel: model,
 			UserTop:      userTopMap[model.ID],
 			AdminTop:     AdminTopMap[model.ID],
-		})
+			UserNickname: model.UserModel.Nickname,
+			UserAvatar:   model.UserModel.Avatar,
+		}
+
+		if model.CategoryModel != nil {
+			data.CategoryTitle = &model.CategoryModel.Title
+		}
+
+		list = append(list, data)
 	}
 
 	res.OkWithList(list, count, c)

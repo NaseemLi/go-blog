@@ -26,4 +26,5 @@ func ArticleRouter(r *gin.RouterGroup) {
 	r.POST("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
 	r.PUT("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
 	r.GET("article/category", middleware.BindQueryMiddleware[articleapi.CategoryListRequest], app.CategoryListView)
+	r.DELETE("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CategoryRemoveView)
 }
