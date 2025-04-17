@@ -1,6 +1,7 @@
 package articleapi
 
 import (
+	"fmt"
 	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
@@ -113,4 +114,26 @@ func (ArticleApi) CategoryListView(c *gin.Context) {
 	}
 
 	res.OkWithList(list, count, c)
+}
+
+func (ArticleApi) CategoryRemoveView(c *gin.Context) {
+	cr := middleware.GetBind[models.RemoveRequest](c)
+
+	var list []models.CategoryModel
+	query := global.DB.Where("id in (?)", cr.IDList)
+	claims := jwts.GetClaims(c)
+	if claims.Role != enum.AdminRole {
+		query.Where("user_id = ?", claims.UserID)
+	}
+
+	global.DB.Where(query).Find(&list)
+	if len(list) > 0 {
+		err := global.DB.Delete(&list).Error
+		if err != nil {
+			res.FailWithMsg("分类删除失败", c)
+			return
+		}
+	}
+
+	res.OkWithMsg(fmt.Sprintf("成功删除 %d 个分类", len(list)), c)
 }
