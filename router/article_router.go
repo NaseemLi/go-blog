@@ -21,10 +21,17 @@ func ArticleRouter(r *gin.RouterGroup) {
 	r.POST("article/look", middleware.BindJsonMiddleware[articleapi.ArticleLookRequest], app.ArticleLookView)
 	r.DELETE("article/:id", middleware.AuthMiddelware, middleware.BindUriMiddleware[models.IDRequest], app.ArticleRemoveUserView)
 	r.DELETE("article", middleware.AdminMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleRemoveAdminView)
+
 	r.GET("article/history", middleware.AuthMiddelware, middleware.BindQueryMiddleware[articleapi.ArticleLookListRequest], app.ArticleLookListView)
 	r.DELETE("article/history", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleLookRemoveView)
-	r.POST("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
-	r.PUT("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
-	r.GET("article/category", middleware.BindQueryMiddleware[articleapi.CategoryListRequest], app.CategoryListView)
-	r.DELETE("article/category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CategoryRemoveView)
+
+	r.POST("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
+	r.PUT("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CategoryCreateRequest], app.CategoryCreateView)
+	r.GET("category", middleware.BindQueryMiddleware[articleapi.CategoryListRequest], app.CategoryListView)
+	r.DELETE("category", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CategoryRemoveView)
+	// 收藏夹的接口（收藏夹 CRUD）
+	r.POST("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CollectCreateRequest], app.CollectCreateView)
+	r.PUT("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CollectCreateRequest], app.CollectCreateView)
+	r.GET("collect", middleware.BindQueryMiddleware[articleapi.CollectListRequest], app.CollectListView)
+	r.DELETE("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CollectRemoveView)
 }
