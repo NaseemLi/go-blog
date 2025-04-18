@@ -35,4 +35,6 @@ func ArticleRouter(r *gin.RouterGroup) {
 
 	r.GET("category/options", middleware.AuthMiddelware, app.CategoryOptionsView)
 	r.GET("article/tag/options", middleware.AuthMiddelware, app.ArticleTagOptions)
+
+	r.DELETE("article/collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleCollectPatchRemoveView)
 }
