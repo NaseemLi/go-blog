@@ -11,22 +11,22 @@ import (
 
 func SyncComment() {
 	applyMap := rediscomment.GetAllCacheApply()
-	//diggMap := commentredis.GetAllCacheDigg()
+	diggMap := rediscomment.GetAllCacheDigg()
 
 	var list []models.CommentModel
 	global.DB.Find(&list)
 
 	for _, model := range list {
 		apply := applyMap[model.ID]
-		// digg := diggMap[model.ID]
+		digg := diggMap[model.ID]
 
-		// if apply == 0 || digg == 0 {
-		// 	continue
-		// }
+		if apply == 0 || digg == 0 {
+			continue
+		}
 
 		err := global.DB.Model(&model).Updates(map[string]any{
 			"apply_count": gorm.Expr("apply_count + ?", apply),
-			//	"digg_count":  gorm.Expr("digg_count + ?", digg),
+			"digg_count":  gorm.Expr("digg_count + ?", digg),
 		}).Error
 		if err != nil {
 			logrus.Errorf("更新失败 %s", err)
