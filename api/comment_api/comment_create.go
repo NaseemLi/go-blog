@@ -7,6 +7,7 @@ import (
 	"goblog/models"
 	"goblog/models/enum"
 	commentservice "goblog/service/comment_service"
+	commentredis "goblog/service/redis_service/comment_redis"
 	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
@@ -49,6 +50,9 @@ func (CommentApi) CommentCreateView(c *gin.Context) {
 		}
 		if len(parentList) > 0 {
 			model.RootParentID = &parentList[len(parentList)-1].ID
+			for _, v := range parentList {
+				commentredis.SetCacheApply(v.ID, 1)
+			}
 		}
 	}
 
