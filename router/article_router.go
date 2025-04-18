@@ -32,6 +32,7 @@ func ArticleRouter(r *gin.RouterGroup) {
 	r.POST("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.CollectCreateRequest], app.CollectCreateView)
 	r.GET("collect", middleware.BindQueryMiddleware[articleapi.CollectListRequest], app.CollectListView)
 	r.DELETE("collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.CollectRemoveView)
-	// 文章的收藏夹接口
+
 	r.GET("category/options", middleware.AuthMiddelware, app.CategoryOptionsView)
+	r.GET("article/tag/options", middleware.AuthMiddelware, app.ArticleTagOptions)
 }
