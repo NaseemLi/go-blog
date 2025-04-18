@@ -3,7 +3,8 @@ package commentservice
 import (
 	"goblog/global"
 	"goblog/models"
-	commentredis "goblog/service/redis_service/comment_redis"
+	rediscomment "goblog/service/redis_service/redis_comment"
+
 	"time"
 )
 
@@ -92,7 +93,7 @@ func getCommentTreeV3(id uint, line int) *CommentResponse {
 		ArticleID:    model.ArticleID,
 		ParentID:     model.ParentID,
 		DiggCount:    model.DiggCount,
-		ApplyCount:   commentredis.GetCacheApply(model.ID),
+		ApplyCount:   rediscomment.GetCacheApply(model.ID),
 		SubComments:  make([]*CommentResponse, 0),
 	}
 
@@ -104,4 +105,19 @@ func getCommentTreeV3(id uint, line int) *CommentResponse {
 		res.SubComments = append(res.SubComments, getCommentTreeV3(commentModel.ID, line+1))
 	}
 	return res
+}
+
+func GetCommentOneDimensionalTree(id uint) (list []*models.CommentModel) {
+	model := models.CommentModel{
+		Model: models.Model{ID: id},
+	}
+
+	global.DB.Preload("SubCommentList").Take(&model)
+	list = append(list, &model)
+	for _, SubCommentList := range model.SubCommentList {
+		subList := GetCommentOneDimensionalTree(SubCommentList.ID)
+		list = append(list, subList...)
+	}
+
+	return
 }
