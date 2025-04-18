@@ -3,6 +3,7 @@ package commentservice
 import (
 	"goblog/global"
 	"goblog/models"
+	commentredis "goblog/service/redis_service/comment_redis"
 	"time"
 )
 
@@ -91,7 +92,7 @@ func getCommentTreeV3(id uint, line int) *CommentResponse {
 		ArticleID:    model.ArticleID,
 		ParentID:     model.ParentID,
 		DiggCount:    model.DiggCount,
-		ApplyCount:   0,
+		ApplyCount:   commentredis.GetCacheApply(model.ID),
 		SubComments:  make([]*CommentResponse, 0),
 	}
 
