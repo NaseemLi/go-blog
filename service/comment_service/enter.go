@@ -27,6 +27,21 @@ func GetCommentTree(model *models.CommentModel) {
 	}
 }
 
+func GetParents(commentID uint) (list []*models.CommentModel) {
+	var comment models.CommentModel
+	err := global.DB.Take(&comment, commentID).Error
+	if err != nil {
+		return
+	}
+
+	list = append(list, &comment)
+	if comment.ParentID != nil {
+		list = append(list, GetParents(*comment.ParentID)...)
+	}
+
+	return
+}
+
 // GetCommentTreeV2 获取评论树
 func GetCommentTreeV2(id uint) (model *models.CommentModel) {
 	model = &models.CommentModel{
