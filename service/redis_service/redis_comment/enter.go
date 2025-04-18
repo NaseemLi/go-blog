@@ -1,8 +1,10 @@
-package commentredis
+package rediscomment
 
 import (
 	"goblog/global"
 	"strconv"
+
+	"github.com/sirupsen/logrus"
 )
 
 type commentCacheType string
@@ -52,4 +54,11 @@ func GetAll(t commentCacheType) (mps map[uint]int) {
 }
 func GetAllCacheApply() (mps map[uint]int) {
 	return GetAll(commentCacheApply)
+}
+
+func Clear() {
+	err := global.Redis.Del("comment_apply_key")
+	if err != nil {
+		logrus.Error(err)
+	}
 }
