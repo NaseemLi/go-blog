@@ -23,6 +23,7 @@ type ArticleListRequest struct {
 	UserID     uint  `form:"userID"`
 	CategoryID *uint `form:"categoryID"`
 	Status     int   `form:"status"`
+	CollectID  *uint `form:"collectID"`
 }
 
 type ArticleListResponse struct {
@@ -62,6 +63,25 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		}
 		cr.Status = 0
 		cr.Order = ""
+		if cr.CollectID != nil && *cr.CollectID != 0 {
+			// 如果传了收藏夹id,也要看人
+			if cr.UserID == 0 {
+				res.FailWithMsg("请传入用户id", c)
+				return
+			}
+
+			var userConf models.UserConfModel
+			err := global.DB.Take(&userConf, "id = ?", cr.UserID).Error
+			if err != nil {
+				res.FailWithMsg("用户不存在", c)
+				return
+			}
+
+			if userConf.OpenCollect {
+				res.FailWithMsg("用户未开放收藏夹", c)
+				return
+			}
+		}
 	case 2:
 		claims, err := jwts.ParseTokenByGin(c)
 		if err != nil {
