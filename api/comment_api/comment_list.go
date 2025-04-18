@@ -7,6 +7,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	rediscomment "goblog/service/redis_service/redis_comment"
 	"goblog/utils/jwts"
 	"time"
 
@@ -71,7 +72,7 @@ func (CommentApi) CommentListView(c *gin.Context) {
 			ArticleID:    model.ArticleID,
 			ArticleTitle: model.ArticleModel.Title,
 			ArticleCover: model.ArticleModel.Cover,
-			DiggCount:    model.DiggCount,
+			DiggCount:    model.DiggCount + rediscomment.GetCacheDigg(model.ID),
 		})
 	}
 
