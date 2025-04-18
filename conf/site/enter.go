@@ -45,5 +45,6 @@ type IndexRight struct {
 }
 
 type Article struct {
-	NoExamine bool `json:"noExamine" yaml:"noExamine"` //免审核
+	NoExamine   bool `json:"noExamine" yaml:"noExamine"` //免审核
+	CommentLine int  `json:"commentLine" yaml:"commentLine"`
 }
