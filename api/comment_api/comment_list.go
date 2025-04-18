@@ -74,5 +74,6 @@ func (CommentApi) CommentListView(c *gin.Context) {
 			DiggCount:    model.DiggCount,
 		})
 	}
+
 	res.OkWithList(list, len(list), c)
 }
