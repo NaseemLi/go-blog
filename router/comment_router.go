@@ -4,6 +4,7 @@ import (
 	"goblog/api"
 	commentapi "goblog/api/comment_api"
 	"goblog/middleware"
+	"goblog/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,4 +12,5 @@ import (
 func CommentRouter(r *gin.RouterGroup) {
 	app := api.App.CommentApi
 	r.POST("comment", middleware.AuthMiddelware, middleware.BindJsonMiddleware[commentapi.CommentCreateRequest], app.CommentCreateView)
+	r.GET("comment/tree/:id", middleware.BindUriMiddleware[models.IDRequest], app.CommentTreeView)
 }
