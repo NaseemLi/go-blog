@@ -7,6 +7,7 @@ import (
 	"goblog/models"
 	"goblog/models/enum"
 	commentservice "goblog/service/comment_service"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -51,6 +52,7 @@ func (CommentApi) CommentCreateView(c *gin.Context) {
 		res.FailWithMsg("评论失败", c)
 		return
 	}
+	redisarticle.SetCacheComment(article.ID, 1)
 
 	res.OkWithMsg("评论成功", c)
 }

@@ -86,5 +86,6 @@ func (ArticleApi) ArticleCreateView(c *gin.Context) {
 		res.FailWithMsg("文章创建失败", c)
 		return
 	}
+
 	res.OkWithMsg("文章创建成功", c)
 }
