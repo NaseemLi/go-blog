@@ -72,17 +72,14 @@ type CommentResponse struct {
 }
 
 func GetCommentTreeV3(id uint) *CommentResponse {
-	model := &models.CommentModel{}
-	err := global.DB.
-		Preload("UserModel").
-		Preload("SubCommentList").
-		Where("id = ?", id).
-		First(model).Error
+	return getCommentTreeV3(id, 1)
+}
 
-	if err != nil {
-		// 数据不存在，直接返回 nil
-		return nil
+func getCommentTreeV3(id uint, line int) *CommentResponse {
+	model := &models.CommentModel{
+		Model: models.Model{ID: id},
 	}
+	global.DB.Preload("UserModel").Preload("SubCommentList").Take(model)
 
 	res := &CommentResponse{
 		ID:           model.ID,
@@ -98,11 +95,12 @@ func GetCommentTreeV3(id uint) *CommentResponse {
 		SubComments:  make([]*CommentResponse, 0),
 	}
 
-	for _, v := range model.SubCommentList {
-		child := GetCommentTreeV3(v.ID)
-		if child != nil {
-			res.SubComments = append(res.SubComments, child)
-		}
+	if line > global.Config.Site.Article.CommentLine {
+		return nil
+	}
+
+	for _, commentModel := range model.SubCommentList {
+		res.SubComments = append(res.SubComments, getCommentTreeV3(commentModel.ID, line+1))
 	}
 	return res
 }
