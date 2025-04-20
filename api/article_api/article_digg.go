@@ -6,6 +6,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	messageservice "goblog/service/message_service"
 	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
@@ -28,15 +29,18 @@ func (ArticleApi) ArticleDiggView(c *gin.Context) {
 	err = global.DB.Take(&userDiggArticle, "user_id = ? and article_id = ?", claims.UserID, cr.ID).Error
 	if err != nil {
 		//点赞
-		err = global.DB.Create(&models.ArticleDiggModel{
+		model := models.ArticleDiggModel{
 			UserID:    claims.UserID,
 			ArticleID: cr.ID,
-		}).Error
+		}
+		err = global.DB.Create(&model).Error
 		if err != nil {
 			res.FailWithMsg("点赞失败", c)
 			return
 		}
 		redisarticle.SetCacheDigg(cr.ID, true)
+		//给文章拥有者发消息
+		go messageservice.InsertDiggArticleMessage(model)
 		res.OkWithMsg("点赞成功", c)
 		return
 	}

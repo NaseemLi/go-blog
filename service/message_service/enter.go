@@ -48,3 +48,52 @@ func InsertApplyMessage(model models.CommentModel) {
 		return
 	}
 }
+
+func InsertDiggArticleMessage(model models.ArticleDiggModel) {
+	global.DB.Preload("ArticleModel").Preload("UserModel").Take(&model)
+	err := global.DB.Create(&models.MessageModel{
+		Type:               messagetypeenum.DiggArticleType,
+		RevUserID:          model.ArticleModel.UserID,
+		ActionUserID:       model.UserID,
+		ActionUserNickname: model.UserModel.Nickname,
+		ActionUserAvatar:   model.UserModel.Avatar,
+		ArticleID:          model.ArticleID,
+		ArticleTitle:       model.ArticleModel.Title,
+	}).Error
+	if err != nil {
+		logrus.Error(err)
+	}
+}
+
+func InsertDiggCommentMessage(model models.CommentDiggModel) {
+	global.DB.Preload("CommentModel.ArticleModel").Preload("UserModel").Take(&model)
+	err := global.DB.Create(&models.MessageModel{
+		Type:               messagetypeenum.DiggCommentType,
+		RevUserID:          model.CommentModel.UserID,
+		ActionUserID:       model.UserID,
+		ActionUserNickname: model.UserModel.Nickname,
+		ActionUserAvatar:   model.UserModel.Avatar,
+		Content:            model.CommentModel.Content,
+		ArticleID:          model.CommentModel.ArticleID,
+		ArticleTitle:       model.CommentModel.ArticleModel.Title,
+	}).Error
+	if err != nil {
+		logrus.Error(err)
+	}
+}
+
+func InsertCollectArticleMessage(model models.UserArticleCollectModel) {
+	global.DB.Preload("ArticleModel").Preload("UserModel").Take(&model)
+	err := global.DB.Create(&models.MessageModel{
+		Type:               messagetypeenum.CollectArticleType,
+		RevUserID:          model.ArticleModel.UserID,
+		ActionUserID:       model.UserID,
+		ActionUserNickname: model.UserModel.Nickname,
+		ActionUserAvatar:   model.UserModel.Avatar,
+		ArticleID:          model.ArticleID,
+		ArticleTitle:       model.ArticleModel.Title,
+	}).Error
+	if err != nil {
+		logrus.Error(err)
+	}
+}
