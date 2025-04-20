@@ -8,6 +8,7 @@ import (
 	imageapi "goblog/api/image_api"
 	logapi "goblog/api/log_api"
 	siteapi "goblog/api/site_api"
+	sitemsgapi "goblog/api/site_msg_api"
 	userapi "goblog/api/user_api"
 )
 
@@ -20,6 +21,7 @@ type Api struct {
 	UserApi    userapi.UserApi
 	ArticleApi articleapi.ArticleApi
 	CommentApi commentapi.CommentApi
+	SiteMsgApi sitemsgapi.SiteMsgApi
 }
 
 var App = Api{}
