@@ -28,3 +28,23 @@ func InsertCommentMessage(model models.CommentModel) {
 		return
 	}
 }
+
+func InsertApplyMessage(model models.CommentModel) {
+	//todo:回复评论的人和评论的人是同一个人时
+	global.DB.Preload("ParentModel").Preload("UserModel").Preload("ArticleModel").Take(&model)
+	err := global.DB.Create(&models.MessageModel{
+		Type:               messagetypeenum.ApplyType,
+		RevUserID:          model.ParentModel.ID,
+		ActionUserID:       model.UserID,
+		ActionUserNickname: model.UserModel.Nickname,
+		ActionUserAvatar:   model.UserModel.Avatar,
+		Content:            model.Content,
+		ArticleID:          model.ArticleID,
+		ArticleTitle:       model.ArticleModel.Title,
+		CommentID:          model.ID,
+	}).Error
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+}
