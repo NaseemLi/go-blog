@@ -55,6 +55,10 @@ func (CommentApi) CommentCreateView(c *gin.Context) {
 			for _, v := range parentList {
 				rediscomment.SetCacheApply(v.ID, 1)
 			}
+			//给父评论的拥有人发送消息
+			defer func() {
+				go messageservice.InsertApplyMessage(model)
+			}()
 		}
 	}
 
