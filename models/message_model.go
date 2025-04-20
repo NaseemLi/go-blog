@@ -14,7 +14,7 @@ type MessageModel struct {
 	ArticleID          uint                 `json:"articleID"`          //文章 ID
 	ArticleTitle       string               `json:"articleTitle"`       //文章标题
 	CommentID          uint                 `json:"commentID"`          //评论 ID
-	Linktitle          string               `json:"linktitle"`          //链接标题
+	LinkTitle          string               `json:"linktitle"`          //链接标题
 	LinkHref           string               `json:"linkhref"`           //链接地址
 	IsRead             bool                 `json:"isRead"`             //是否已读
 }

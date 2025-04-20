@@ -8,6 +8,7 @@ import (
 	"goblog/models"
 	"goblog/models/enum"
 	commentservice "goblog/service/comment_service"
+	messageservice "goblog/service/message_service"
 	rediscomment "goblog/service/redis_service/redis_comment"
 	"goblog/utils/jwts"
 
@@ -33,6 +34,7 @@ func (CommentApi) CommentRemoveView(c *gin.Context) {
 			return
 		}
 	}
+	messageservice.InsertSystemMessage(model.UserID, "管理员删除了你的评论", fmt.Sprintf("%s内容不符合社区规范", model.Content), "", "")
 
 	subList := commentservice.GetCommentOneDimensionalTree(model.ID)
 	//删除评论,找所有的子评论,还要找所有的父评论
