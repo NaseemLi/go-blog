@@ -4,6 +4,8 @@ import (
 	"goblog/models/enum"
 	"math"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type UserModel struct {
@@ -21,6 +23,32 @@ type UserModel struct {
 	UserConfModel  *UserConfModel          `gorm:"foreignKey:UserID" json:"-"`
 	Ip             string                  `json:"ip"`
 	Addr           string                  `json:"addr"`
+}
+
+func (u *UserModel) AfterCreate(tx *gorm.DB) error {
+	// 创建用户配置记录
+	err := tx.Create(&UserConfModel{
+		UserID:      u.ID,
+		OpenFollow:  true,
+		OpenCollect: true,
+		OpenFans:    true,
+		HomeStyleID: 1,
+	}).Error
+	if err != nil {
+		return err
+	}
+
+	// 创建用户消息配置记录
+	err = tx.Create(&UserMessageConfModel{
+		UserID:             u.ID,
+		OpenCommentMessage: true,
+		OpenDiggMessage:    true,
+		OpenPrivateChat:    true,
+	}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UserModel) GetCodeAge() int {
