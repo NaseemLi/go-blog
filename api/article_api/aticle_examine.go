@@ -1,10 +1,12 @@
 package articleapi
 
 import (
+	"fmt"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/middleware"
 	"goblog/models"
+	messageservice "goblog/service/message_service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +29,12 @@ func (ArticleApi) ArticleExamineView(c *gin.Context) {
 	}
 	global.DB.Model(&article).Update("status", cr.Status)
 
-	// todo发送系统通知
+	switch cr.Status {
+	case 3: //审核成功
+		messageservice.InsertSystemMessage(article.UserID, "管理员审核了你的文章", "审核成功", article.Title, fmt.Sprintf("/article/%d", article.ID))
+	case 4: //审核失败
+		messageservice.InsertSystemMessage(article.UserID, "管理员审核了你的文章", fmt.Sprintf("审核失败,失败原因: %s", cr.Msg), "", "")
+	}
 
 	res.OkWithMsg("文章审核成功", c)
 }
