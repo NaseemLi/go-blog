@@ -7,6 +7,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	messageservice "goblog/service/message_service"
 	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 
@@ -60,19 +61,22 @@ func (ArticleApi) ArticleCollectView(c *gin.Context) {
 
 	if err != nil {
 		// 收藏
-		err = global.DB.Create(&models.UserArticleCollectModel{
+		model := models.UserArticleCollectModel{
 			UserID:    claims.UserID,
 			ArticleID: cr.ArticleID,
 			CollectID: cr.CollectID,
-		}).Error
+		}
+		err = global.DB.Create(&model).Error
 		if err != nil {
 			res.FailWithMsg("收藏失败", c)
 			return
 		}
+
 		res.OkWithMsg("收藏成功", c)
 
 		// 对收藏夹进行加1
 		redisarticle.SetCacheCollect(cr.CollectID, true)
+		go messageservice.InsertCollectArticleMessage(model)
 		global.DB.Model(&collectModel).Update("article_count", gorm.Expr("article_count + 1"))
 		return
 	}
