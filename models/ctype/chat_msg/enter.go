@@ -6,6 +6,7 @@ type TextMsg struct {
 
 type ImageMsg struct {
 	Href string `json:"href"` // 图片地址
+	Src  string `json:"src"`
 }
 
 type MarkDownMsg struct {
