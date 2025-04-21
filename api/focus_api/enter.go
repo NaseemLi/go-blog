@@ -166,3 +166,40 @@ func (FocusApi) FansUserListView(c *gin.Context) {
 	}
 	res.OkWithList(list, len(list), c)
 }
+
+type UnFocusUserRequest struct {
+	FocusUserID uint `json:"focusUserID" binding:"required"`
+}
+
+func (FocusApi) UnFocusUserView(c *gin.Context) {
+	cr := middleware.GetBind[UnFocusUserRequest](c)
+	claims := jwts.GetClaims(c)
+
+	//自己不能取关自己
+	if claims.UserID == cr.FocusUserID {
+		res.FailWithMsg("失败!你正在取关自己", c)
+		return
+	}
+
+	//查取关的用户是否存在
+	var user models.UserModel
+	err := global.DB.Take(&user, cr.FocusUserID).Error
+	if err != nil {
+		res.FailWithMsg("取关用户不存在", c)
+		return
+	}
+
+	//查之前是否已经关注
+	var userFocus models.UserFocusModel
+	err = global.DB.Take(&userFocus, "user_id = ? and focus_user_id = ?", claims.UserID, cr.FocusUserID).Error
+	if err != nil {
+		// 查到了记录，说明已经关注
+		res.FailWithMsg("未关注此用户", c)
+		return
+	}
+
+	//取消关注
+	global.DB.Delete(&userFocus)
+
+	res.OkWithMsg("取关成功", c)
+}
