@@ -4,6 +4,7 @@ import (
 	articleapi "goblog/api/article_api"
 	bannerapi "goblog/api/banner_api"
 	captchaapi "goblog/api/captcha_api"
+	chatapi "goblog/api/chat_api"
 	commentapi "goblog/api/comment_api"
 	focusapi "goblog/api/focus_api"
 	globalnotificationapi "goblog/api/global_notification_api"
@@ -26,6 +27,7 @@ type Api struct {
 	SiteMsgApi            sitemsgapi.SiteMsgApi
 	GlobalNotificationApi globalnotificationapi.GlobalNotificationApi
 	FocusApi              focusapi.FocusApi
+	ChatApi               chatapi.ChatApi
 }
 
 var App = Api{}
