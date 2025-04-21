@@ -6,6 +6,7 @@ import (
 	"goblog/global"
 	"goblog/middleware"
 	"goblog/models"
+	"goblog/models/enum"
 	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,9 @@ type ChatApi struct {
 
 type ChatRecordRequest struct {
 	common.PageInfo
-	UserID uint `form:"userID" binding:"required"`
+	SendUserID uint `form:"sendUserID"`
+	RevUserID  uint `form:"revUserID" binding:"required"`
+	Type       int8 `form:"type" binding:"required,oneof=1 2"`
 }
 
 type ChatRecordResponse struct {
@@ -26,12 +29,38 @@ type ChatRecordResponse struct {
 	RevUserNickname  string `json:"revUserNickname"`
 	RevUserAvatar    string `json:"revUserAvatar"`
 	IsMe             bool   `json:"isMe"`
+	IsRead           bool   `json:"isRead"`
 }
 
 func (ChatApi) ChatRecordView(c *gin.Context) {
 	cr := middleware.GetBind[ChatRecordRequest](c)
 	claims := jwts.GetClaims(c)
-	query := global.DB.Where("(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)", cr.UserID, claims.UserID, claims.UserID, cr.UserID)
+	var deleteIDList []uint
+
+	switch cr.Type {
+	case 1:
+		//前台用户调用
+		//找我删除的消息
+		global.DB.Model(&models.UserChatActionModel{}).Where("user_id = ? and is_delete = ?", claims.UserID, true).Select("chat_id").Scan(&deleteIDList)
+
+		cr.SendUserID = claims.UserID
+	case 2:
+		if claims.Role != enum.AdminRole {
+			res.FailWithMsg("权限错误", c)
+			return
+		}
+		if cr.SendUserID == 0 {
+			res.FailWithMsg("发送者不能为空", c)
+			return
+		}
+	}
+
+	query := global.DB.Where("(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)",
+		cr.SendUserID, cr.RevUserID, cr.RevUserID, cr.SendUserID)
+
+	if len(deleteIDList) > 0 {
+		query = query.Where("id not in ?", deleteIDList)
+	}
 
 	cr.Order = "created_at desc"
 	_list, _, _ := common.ListQuery(models.ChatModel{}, common.Options{
