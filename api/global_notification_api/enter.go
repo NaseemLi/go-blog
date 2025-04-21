@@ -49,7 +49,7 @@ func (GlobalNotificationApi) CreateView(c *gin.Context) {
 
 type ListRequest struct {
 	common.PageInfo
-	Type int8 `json:"type" binding:"required,oneof=1 2"`
+	Type int8 `form:"type" binding:"required,oneof=1 2"`
 }
 
 type ListResponse struct {
@@ -67,14 +67,21 @@ func (GlobalNotificationApi) ListView(c *gin.Context) {
 	switch cr.Type {
 	case 1: //没被用户删除的
 		var ugnmList []models.UserGlobalNotificationModel
-		global.DB.Find(&ugnmList, "user_id = ? and is_delete = ?", claims.UserID, false)
+		global.DB.Find(&ugnmList, "user_id = ?", claims.UserID)
 		var msgIDList []uint
 		for _, v := range ugnmList {
-			readMsgMap[v.NotificationID] = v.IsRead
-			msgIDList = append(msgIDList, v.ID)
+			if v.IsDelete {
+				msgIDList = append(msgIDList, v.ID)
+				continue
+			}
+			if v.IsRead {
+				readMsgMap[v.NotificationID] = true
+			}
+		}
+		if len(msgIDList) > 0 {
+			query = global.DB.Where("id not in (?)", msgIDList)
 		}
 
-		query = global.DB.Where("id in (?)", msgIDList)
 	case 2:
 		if claims.Role != enum.AdminRole {
 			res.FailWithMsg("没有权限", c)
@@ -162,7 +169,7 @@ func (GlobalNotificationApi) UserMsgActionView(c *gin.Context) {
 	if ugnm.IsRead {
 		//如果现在删除成功就更新
 		if model.IsDelete {
-			global.DB.Model(&ugnm).Update("is_read", true)
+			global.DB.Model(&ugnm).Update("is_delete", true)
 		}
 	}
 
