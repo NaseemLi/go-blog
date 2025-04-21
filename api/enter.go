@@ -5,6 +5,7 @@ import (
 	bannerapi "goblog/api/banner_api"
 	captchaapi "goblog/api/captcha_api"
 	commentapi "goblog/api/comment_api"
+	focusapi "goblog/api/focus_api"
 	globalnotificationapi "goblog/api/global_notification_api"
 	imageapi "goblog/api/image_api"
 	logapi "goblog/api/log_api"
@@ -24,6 +25,7 @@ type Api struct {
 	CommentApi            commentapi.CommentApi
 	SiteMsgApi            sitemsgapi.SiteMsgApi
 	GlobalNotificationApi globalnotificationapi.GlobalNotificationApi
+	FocusApi              focusapi.FocusApi
 }
 
 var App = Api{}
