@@ -25,6 +25,10 @@ type UserModel struct {
 	Addr           string                  `json:"addr"`
 }
 
+func (u UserModel) GetID() uint {
+	return u.ID
+}
+
 func (u *UserModel) AfterCreate(tx *gorm.DB) error {
 	// 创建用户配置记录
 	err := tx.Create(&UserConfModel{
