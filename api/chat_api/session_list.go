@@ -124,5 +124,5 @@ func (ChatApi) SessionListView(c *gin.Context) {
 		list = append(list, item)
 	}
 
-	res.OkWithList(list, count, c)
+	res.OkWithList(list, len(list), c)
 }
