@@ -36,6 +36,12 @@ func (ChatApi) ChatRecordView(c *gin.Context) {
 	cr := middleware.GetBind[ChatRecordRequest](c)
 	claims := jwts.GetClaims(c)
 	var deleteIDList []uint
+	var UserChatActionList []models.UserChatActionModel
+	var UserChatReadMap = map[uint]bool{}
+	global.DB.Find(&UserChatActionList, "user_id = ? and (is_delete = ? or is_delete is null)", cr.RevUserID, false)
+	for _, v := range UserChatActionList {
+		UserChatReadMap[v.ChatID] = true
+	}
 
 	switch cr.Type {
 	case 1:
@@ -77,6 +83,7 @@ func (ChatApi) ChatRecordView(c *gin.Context) {
 			SendUserAvatar:   model.SendUserModel.Avatar,
 			RevUserNickname:  model.RevUserModel.Nickname,
 			RevUserAvatar:    model.RevUserModel.Avatar,
+			IsRead:           UserChatReadMap[model.ID],
 		}
 		if model.SendUserModel.ID == claims.UserID {
 			item.IsMe = true
