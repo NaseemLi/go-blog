@@ -13,7 +13,7 @@ func main() {
 	global.Config = core.ReadConf()
 	core.InitLogrus()
 	token, err := jwts.GetToken(jwts.Claims{
-		UserID: 1,
+		UserID: 2,
 		Role:   1,
 	})
 	fmt.Println(token, err)
