@@ -15,4 +15,5 @@ func ChatRouter(r *gin.RouterGroup) {
 	r.GET("chat/session", middleware.AuthMiddelware, middleware.BindQueryMiddleware[chatapi.SessionListRequest], app.SessionListView)
 	r.DELETE("chat", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.UserChatDeleteView)
 	r.DELETE("chat/user/:id", middleware.AuthMiddelware, middleware.BindUriMiddleware[models.IDRequest], app.UserChatDeleteByUserView)
+	r.PUT("chat/read/:id", middleware.AuthMiddelware, middleware.BindUriMiddleware[models.IDRequest], app.UserChatReadView)
 }

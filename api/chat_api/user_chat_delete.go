@@ -1,6 +1,7 @@
 package chatapi
 
 import (
+	"fmt"
 	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
@@ -67,5 +68,6 @@ func (ChatApi) UserChatDeleteView(c *gin.Context) {
 	}
 	DeleteList = append(DeleteList, updateChatAcIdList...)
 
-	res.OkWithList(DeleteList, len(DeleteList), c)
+	// res.OkWithList(DeleteList, len(DeleteList), c)
+	res.OkWithMsg(fmt.Sprintf("删除成功,共删除 %d 条消息", len(DeleteList)), c)
 }
