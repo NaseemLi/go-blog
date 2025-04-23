@@ -44,7 +44,7 @@ func ToMarkDownChat(A, B uint, content string) {
 	//过滤xss
 	filterContent := xss.XSSFilter(content)
 
-	ToChat(A, B, chatmsgtypeenum.MarkDwonMsgType, chatmsg.ChatMsg{
+	ToChat(A, B, chatmsgtypeenum.MarkDownMsgType, chatmsg.ChatMsg{
 		MarkDownMsg: &chatmsg.MarkDownMsg{
 			Content: filterContent,
 		},
