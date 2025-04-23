@@ -25,7 +25,7 @@ var OnlineMap = map[uint]map[string]*websocket.Conn{}
 
 type ChatRequest struct {
 	RevUserID uint                    `json:"revUserID"` //发给谁
-	MsgType   chatmsgtypeenum.MsgType `json:"msgType" `  //1.文本 2.图片 3.Md
+	MsgType   chatmsgtypeenum.MsgType `json:"msgType"`   //1.文本 2.图片 3.Md
 	Msg       chatmsg.ChatMsg         `json:"msg"`       //消息主体
 }
 
@@ -46,6 +46,12 @@ func (ChatApi) ChatView(c *gin.Context) {
 		return
 	}
 	userID := claims.UserID
+	var user models.UserModel
+	err = global.DB.Take(&user, userID).Error
+	if err != nil {
+		res.SendConnFailWithMsg("用户不存在", conn)
+		return
+	}
 	addr := conn.RemoteAddr().String()
 	addrMap, ok := OnlineMap[userID]
 	if !ok {
@@ -74,60 +80,44 @@ func (ChatApi) ChatView(c *gin.Context) {
 		var req ChatRequest
 		err2 := json.Unmarshal(p, &req)
 		if err2 != nil {
-			byteData, _ := json.Marshal(&res.Response{
-				Code: 1002,
-				Msg:  "消息格式错误",
-			})
-			conn.WriteMessage(websocket.TextMessage, byteData)
+			res.SendConnFailWithMsg("消息格式错误", conn)
 			continue
 		}
 		//判断接收人在不在
 		var revUserID models.UserModel
 		err = global.DB.Take(&revUserID, req.RevUserID).Error
 		if err != nil {
-			byteData, _ := json.Marshal(&res.Response{
-				Code: 1002,
-				Msg:  "接收人不存在",
-			})
-			conn.WriteMessage(websocket.TextMessage, byteData)
+			res.SendConnFailWithMsg("接收人不存在", conn)
 			continue
 		}
 		//先落库
-
-		//消息接收人,看看是否在线,在线就发送给对方
-		addrMap, ok := OnlineMap[req.RevUserID]
-		if ok {
-			for _, w := range addrMap {
-				byteData, _ := json.Marshal(&res.Response{
-					Code: 0,
-					Msg:  "成功",
-					Data: ChatResponse{
-						ChatRecordResponse: ChatRecordResponse{
-							ChatModel: models.ChatModel{
-								MsgType: req.MsgType,
-								Msg:     req.Msg,
-							},
-						},
-					},
-				})
-				w.WriteMessage(websocket.TextMessage, byteData)
-			}
-			byteData, _ := json.Marshal(&res.Response{
-				Code: 0,
-				Msg:  "成功",
-				Data: ChatResponse{
-					ChatRecordResponse: ChatRecordResponse{
-						ChatModel: models.ChatModel{
-							MsgType: req.MsgType,
-							Msg:     req.Msg,
-						},
-					},
-				},
-			})
-			//给自己也发一份
-			conn.WriteMessage(websocket.TextMessage, byteData)
+		model := models.ChatModel{
+			SendUserID: claims.UserID,
+			RevUserID:  req.RevUserID,
+			MsgType:    req.MsgType,
+			Msg:        req.Msg,
+		}
+		err = global.DB.Create(&model).Error
+		if err != nil {
+			res.SendConnFailWithMsg("数据库保存失败", conn)
 			continue
 		}
+
+		item := ChatResponse{
+			ChatRecordResponse: ChatRecordResponse{
+				ChatModel:        model,
+				SendUserNickname: user.Nickname,
+				SendUserAvatar:   user.Avatar,
+				RevUserNickname:  revUserID.Nickname,
+				RevUserAvatar:    revUserID.Avatar,
+			},
+		}
+		//消息接收人,看看是否在线,在线就发送给对方
+		//发给对方
+		res.SendWsMsg(OnlineMap, req.RevUserID, item)
+		//发给自己
+		item.IsMe = true
+		res.SendConnOkWithData(item, conn)
 	}
 
 	defer conn.Close()
