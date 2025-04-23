@@ -8,7 +8,10 @@ import (
 	"goblog/models"
 	chatmsg "goblog/models/ctype/chat_msg"
 	chatmsgtypeenum "goblog/models/enum/chat_msg_type_enum"
+	relationshipenum "goblog/models/enum/relationship_enum"
+	focusservice "goblog/service/focus_service"
 	"goblog/utils/jwts"
+	"goblog/utils/xss"
 	"io"
 
 	"github.com/gin-gonic/gin"
@@ -64,7 +67,6 @@ func (ChatApi) ChatView(c *gin.Context) {
 			OnlineMap[userID][addr] = conn
 		}
 	}
-	//todo:未显示
 	fmt.Sprintln("连接", OnlineMap)
 	for {
 		// 消息类型，消息，错误
@@ -90,6 +92,92 @@ func (ChatApi) ChatView(c *gin.Context) {
 			res.SendConnFailWithMsg("接收人不存在", conn)
 			continue
 		}
+
+		// 具体的消息类型做处理
+		switch req.MsgType {
+
+		case chatmsgtypeenum.TextMsgType:
+			if req.Msg.TextMsg == nil || req.Msg.TextMsg.Content == "" {
+				res.SendConnFailWithMsg("文本消息内容为空", conn)
+				continue
+			}
+		case chatmsgtypeenum.ImageMsgType:
+			if req.Msg.ImageMsg == nil || req.Msg.ImageMsg.Src == "" {
+				res.SendConnFailWithMsg("图片消息内容为空", conn)
+				continue
+			}
+		case chatmsgtypeenum.MarkDownMsgType:
+			if req.Msg.MarkDownMsg == nil || req.Msg.MarkDownMsg.Content == "" {
+				res.SendConnFailWithMsg("markdown消息内容为空", conn)
+				continue
+			}
+			// 对markdown消息做过滤
+			req.Msg.MarkDownMsg.Content = xss.XSSFilter(req.Msg.MarkDownMsg.Content)
+		default:
+			res.SendConnFailWithMsg("不支持的消息类型", conn)
+			continue
+		}
+
+		// 判断你与对方的好友关系
+		// 好友就能每天聊
+		// 已关注和粉丝 如果对方没有回复你，那么每天只能聊一次  对方如果没有回你，那么你只能发三条消息
+		// 陌生人，如果对方开了陌生人私信，那么就能聊
+		relation := focusservice.CalcUserRelationship(userID, req.RevUserID)
+
+		switch relation {
+		case relationshipenum.RelationStranger: // 陌生人
+			var revUserMsgConf models.UserMessageConfModel
+			err = global.DB.Take(&revUserMsgConf, "user_id = ?", revUserID.ID).Error
+			if err != nil {
+				res.SendConnFailWithMsg("接收人隐私设置不存在", conn)
+				continue
+			}
+			if !revUserMsgConf.OpenPrivateChat {
+				res.SendConnFailWithMsg("对方未开始陌生人私聊", conn)
+				continue
+			}
+			// 陌生人频控：对方未回复前，每天只能发一条
+			var chatList []models.ChatModel
+			global.DB.Find(&chatList, "date(created_at) = date (now()) and ( (send_user_id = ? and  rev_user_id = ?) or (send_user_id = ? and  rev_user_id = ?))",
+				userID, req.RevUserID, req.RevUserID, userID)
+
+			var sendChatCount, revChatCount int
+			for _, model := range chatList {
+				if model.SendUserID == userID {
+					sendChatCount++
+				}
+				if model.RevUserID == userID {
+					revChatCount++
+				}
+			}
+			if sendChatCount > 0 && revChatCount == 0 {
+				res.SendConnFailWithMsg("对方未回复的情况下，陌生人每天只能发送一条消息", conn)
+				continue
+			}
+		case relationshipenum.RelationFocus, relationshipenum.RelationFans: // 已关注
+			// 今天对方如果没有回复你，那么你就只能发一条
+			var chatList []models.ChatModel
+			global.DB.Find(&chatList, "date(created_at) = date (now()) and ( (send_user_id = ? and  rev_user_id = ?) or (send_user_id = ? and  rev_user_id = ?))",
+				userID, req.RevUserID, req.RevUserID, userID)
+
+			// 我发的  对方发的
+			var sendChatCount, revChatCount int
+			for _, model := range chatList {
+				if model.SendUserID == userID {
+					sendChatCount++
+				}
+				if model.RevUserID == userID {
+					revChatCount++
+				}
+			}
+
+			if sendChatCount > 0 && revChatCount == 0 {
+				res.SendConnFailWithMsg("对方未回复的情况下，当天只能发送一条消息", conn)
+				continue
+			}
+
+		}
+
 		//先落库
 		model := models.ChatModel{
 			SendUserID: claims.UserID,
