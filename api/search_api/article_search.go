@@ -10,6 +10,7 @@ import (
 	"goblog/middleware"
 	"goblog/models"
 	"goblog/models/enum"
+	redisarticle "goblog/service/redis_service/redis_article"
 	"goblog/utils/jwts"
 	"goblog/utils/sql"
 
@@ -55,6 +56,10 @@ func (SearchApi) ArticleSearchView(c *gin.Context) {
 	}
 
 	topArticleIDList := getAdminTopArticleIDList()
+	collectMap := redisarticle.GetAllCacheCollect()
+	diggMap := redisarticle.GetAllCacheDigg()
+	lookMap := redisarticle.GetAllCacheLook()
+	commentMap := redisarticle.GetAllCacheComment()
 
 	if global.ESClient == nil {
 		//服务讲解,用户可能没有配置 es
@@ -87,6 +92,10 @@ func (SearchApi) ArticleSearchView(c *gin.Context) {
 
 		var list = make([]ArticleListResponse, 0)
 		for _, model := range _list {
+			model.DiggCount = model.DiggCount + diggMap[model.ID]
+			model.CollectCount = model.CollectCount + collectMap[model.ID]
+			model.LookCount = model.LookCount + lookMap[model.ID]
+			model.CommentCount = model.CommentCount + commentMap[model.ID]
 			item := ArticleListResponse{
 				ArticleModel: model,
 				AdminTop:     articleTopMap[model.ID],
@@ -213,6 +222,10 @@ func (SearchApi) ArticleSearchView(c *gin.Context) {
 
 	var list = make([]ArticleListResponse, 0)
 	for _, model := range _list {
+		model.DiggCount = model.DiggCount + diggMap[model.ID]
+		model.CollectCount = model.CollectCount + collectMap[model.ID]
+		model.LookCount = model.LookCount + lookMap[model.ID]
+		model.CommentCount = model.CommentCount + commentMap[model.ID]
 		item := ArticleListResponse{
 			ArticleModel: model,
 			AdminTop:     articleTopMap[model.ID],
