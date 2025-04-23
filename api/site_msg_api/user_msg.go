@@ -1,6 +1,7 @@
 package sitemsgapi
 
 import (
+	"goblog/common"
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
@@ -34,6 +35,24 @@ func (SiteMsgApi) UserMsgView(c *gin.Context) {
 		}
 	}
 	//todo : 算未读私信总数 未读全局消息总数
+	//接收人是我,且消息未读
+	var chatList []models.ChatModel
+	global.DB.Find(&chatList, "rev_user_id = ?", claims.UserID)
+	var chatIDList []uint
+	for _, model := range chatList {
+		chatIDList = append(chatIDList, model.ID)
+	}
+
+	chatAcMap := common.ScanMapV2(models.UserChatActionModel{}, common.ScanOption{
+		Where: global.DB.Where("chat_id IN ?", chatIDList),
+	})
+	for _, model := range chatList {
+		_, ok := chatAcMap[model.ID]
+		if !ok {
+			data.PrivateMsgCount++
+			continue
+		}
+	}
 	//过滤掉删除的,只取未读的
 	var userReadMsgIDList []uint
 	global.DB.Model(&models.UserGlobalNotificationModel{}).Where("user_id = ? and (is_read = ? or is_delete != ?)", claims.UserID, true, true).Select("id").Scan(&userReadMsgIDList)
