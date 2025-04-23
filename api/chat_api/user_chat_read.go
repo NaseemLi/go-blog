@@ -5,6 +5,8 @@ import (
 	"goblog/global"
 	"goblog/middleware"
 	"goblog/models"
+	chatmsg "goblog/models/ctype/chat_msg"
+	chatmsgtypeenum "goblog/models/enum/chat_msg_type_enum"
 	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +22,19 @@ func (ChatApi) UserChatReadView(c *gin.Context) {
 		return
 	}
 
+	item := ChatResponse{
+		ChatRecordResponse: ChatRecordResponse{
+			ChatModel: models.ChatModel{
+				MsgType: chatmsgtypeenum.MsgReadType,
+				Msg: chatmsg.ChatMsg{
+					MsgReadMsg: &chatmsg.MsgReadMsg{
+						ReadChatID: chat.ID,
+					},
+				},
+			},
+		},
+	}
+
 	var chatAc models.UserChatActionModel
 	err = global.DB.Take(&chatAc, "user_id = ? and chat_id = ?", claims.UserID, chat.ID).Error
 	if err != nil {
@@ -28,6 +43,7 @@ func (ChatApi) UserChatReadView(c *gin.Context) {
 			ChatID: cr.ID,
 			IsRead: true,
 		})
+		res.SendWsMsg(OnlineMap, chat.SendUserID, item)
 		res.OkWithMsg("消息已标记为已读", c)
 		return
 	}
@@ -37,9 +53,8 @@ func (ChatApi) UserChatReadView(c *gin.Context) {
 		return
 	}
 
-	global.DB.Model(&chatAc).Updates(map[string]any{
-		"is_read": true,
-	})
+	res.SendWsMsg(OnlineMap, chat.SendUserID, item)
+	global.DB.Model(&chatAc).Updates(map[string]any{"is_read": true})
 
 	res.OkWithMsg("消息已标记为已读", c)
 }
