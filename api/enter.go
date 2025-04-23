@@ -10,6 +10,7 @@ import (
 	globalnotificationapi "goblog/api/global_notification_api"
 	imageapi "goblog/api/image_api"
 	logapi "goblog/api/log_api"
+	searchapi "goblog/api/search_api"
 	siteapi "goblog/api/site_api"
 	sitemsgapi "goblog/api/site_msg_api"
 	userapi "goblog/api/user_api"
@@ -28,6 +29,7 @@ type Api struct {
 	GlobalNotificationApi globalnotificationapi.GlobalNotificationApi
 	FocusApi              focusapi.FocusApi
 	ChatApi               chatapi.ChatApi
+	SearchApi             searchapi.SearchApi
 }
 
 var App = Api{}
