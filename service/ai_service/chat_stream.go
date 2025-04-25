@@ -2,12 +2,16 @@ package aiservice
 
 import (
 	"bufio"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
 	"github.com/sirupsen/logrus"
 )
+
+//go:embed chat_stream.prompt
+var chatStreamPrompt string
 
 // 用于流式响应的结构体
 type StreamChoice struct {
@@ -31,14 +35,14 @@ type ChatStreamResponse struct {
 	SystemFingerprint *string        `json:"system_fingerprint,omitempty"`
 }
 
-func ChatStream(content string) (msgChan chan string, err error) {
+func ChatStream(content string, params string) (msgChan chan string, err error) {
 	msgChan = make(chan string)
 	r := Request{
 		Model: "gpt-3.5-turbo",
 		Messages: []Messages{
 			{
 				Role:    "system",
-				Content: "你一个博客系统的AI助手,除了代码问题.平常都首选中文回答",
+				Content: chatStreamPrompt + params,
 			},
 			{
 				Role:    "user",
