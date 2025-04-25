@@ -5,6 +5,7 @@ import (
 	"goblog/global"
 	"goblog/models/ctype"
 	"goblog/models/enum"
+	textservice "goblog/service/text_service"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -64,4 +65,45 @@ func (a *ArticleModel) BeforeDelete(tx *gorm.DB) (err error) {
 	logrus.Infof("删除关联浏览记录%d条", len(lookList))
 
 	return
+}
+
+func (a *ArticleModel) AfterCreate(tx *gorm.DB) (err error) {
+	// 创建之后的钩子函数
+	// 只有发布中的文章会放到全文搜索内
+	if a.Status == enum.ArticleStatusPublished {
+		return nil
+	}
+
+	textList := textservice.MdContentTransformation(a.ID, a.Title, a.Content)
+	var list []TextModel
+	for _, v := range textList {
+		list = append(list, TextModel{
+			ArticleID: v.ArticleID,
+			Head:      v.Head,
+			Body:      v.Body,
+		})
+	}
+	err = tx.Create(&list).Error
+	if err != nil {
+		logrus.Errorf("创建文本列表失败: %v", err)
+		return nil
+	}
+	return
+}
+
+func (a *ArticleModel) AfterDelete(tx *gorm.DB) (err error) {
+	//删除之后
+	var testList []TextModel
+	global.DB.Find(&testList, "article_id = ?", a.ID).Delete(&testList)
+	if len(testList) > 0 {
+		logrus.Infof("删除关联文本列表%d条", len(testList))
+	}
+	return nil
+}
+
+func (a *ArticleModel) AfterUpdate(tx *gorm.DB) (err error) {
+	// 更新之后的钩子函数
+	a.AfterDelete(tx)
+	a.AfterCreate(tx)
+	return nil
 }
