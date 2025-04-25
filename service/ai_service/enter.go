@@ -2,6 +2,7 @@ package aiservice
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"goblog/global" // 替代某些 io/ioutil 函数
@@ -59,22 +60,8 @@ type TokenDetails struct {
 
 const baseUrl = "https://api.chatanywhere.tech/v1/chat/completions"
 
-func Chat(content string) (msg string, err error) {
+func BaseRequest(r Request) (res *http.Response, err error) {
 	method := "POST"
-	r := Request{
-		Model: "gpt-3.5-turbo",
-		Messages: []Messages{
-			{
-				Role:    "system",
-				Content: "你一个博客系统的AI助手,除了代码问题.平常都首选中文回答",
-			},
-			{
-				Role:    "user",
-				Content: content,
-			},
-		},
-		Stream: false,
-	}
 
 	byteData, _ := json.Marshal(r)
 	req, err := http.NewRequest(method, baseUrl, bytes.NewBuffer(byteData))
@@ -85,13 +72,34 @@ func Chat(content string) (msg string, err error) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", global.Config.Ai.SecretKey))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := http.DefaultClient.Do(req)
+	res, err = http.DefaultClient.Do(req)
+	return
+
+}
+
+//go:embed chat.prompt
+var chatPrompt string
+
+func Chat(content string) (msg string, err error) {
+
+	r := Request{
+		Model: "gpt-3.5-turbo",
+		Messages: []Messages{
+			{
+				Role:    "system",
+				Content: chatPrompt,
+			},
+			{
+				Role:    "user",
+				Content: content,
+			},
+		},
+		Stream: false,
+	}
+	res, err := BaseRequest(r)
 	if err != nil {
-		logrus.Errorf("请求失败%v", err)
 		return
 	}
-	defer res.Body.Close()
-
 	body, _ := ioutil.ReadAll(res.Body)
 
 	var response ChatResponse
@@ -102,7 +110,7 @@ func Chat(content string) (msg string, err error) {
 	}
 
 	if len(response.Choices) == 0 {
-		logrus.Warnf("AI 返回为空，content=%s，响应内容=%s", content, string(body))
+		logrus.Warnf("AI 返回为空,content=%s,响应内容=%s", content, string(body))
 		err = fmt.Errorf("AI 返回内容为空")
 		return
 	}
