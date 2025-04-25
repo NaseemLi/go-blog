@@ -1,4 +1,4 @@
 package aiapi
 
-type AiAPi struct {
+type AiApi struct {
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	aiapi "goblog/api/ai_api"
 	articleapi "goblog/api/article_api"
 	bannerapi "goblog/api/banner_api"
 	captchaapi "goblog/api/captcha_api"
@@ -30,6 +31,7 @@ type Api struct {
 	FocusApi              focusapi.FocusApi
 	ChatApi               chatapi.ChatApi
 	SearchApi             searchapi.SearchApi
+	AiApi                 aiapi.AiApi
 }
 
 var App = Api{}
