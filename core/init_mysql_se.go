@@ -9,6 +9,10 @@ import (
 
 func InitMysqlSE() {
 	if !global.Config.River.Enable {
+		logrus.Infof("关闭 mysql 同步操作")
+		return
+	}
+	if !global.Config.ES.Enable {
 		logrus.Infof("未配置es,关闭 mysql 同步操作")
 		return
 	}
