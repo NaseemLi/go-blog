@@ -4,8 +4,6 @@ import (
 	"bufio"
 	_ "embed"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 
 	"github.com/sirupsen/logrus"
 )
@@ -53,44 +51,39 @@ func ChatStream(content string, params string) (msgChan chan string, err error) 
 	}
 	res, err := BaseRequest(r)
 	if err != nil {
-		return
-	}
-	body, _ := ioutil.ReadAll(res.Body)
-
-	var response ChatResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		logrus.Errorf("解析失败%v %s", err, string(body))
-		return
+		return nil, err // 这里一定要返回错误，不然外层判断是空 chan 就会卡死
 	}
 
 	scanner := bufio.NewScanner(res.Body)
-	// 按行分割
 	scanner.Split(bufio.ScanLines)
+
 	go func() {
+		defer res.Body.Close()
+		defer close(msgChan)
 
+		for scanner.Scan() {
+			text := scanner.Text()
+			if text == "" {
+				continue
+			}
+			if len(text) < 6 || text[:6] != "data: " {
+				continue
+			}
+			data := text[6:]
+			if data == "[DONE]" {
+				return
+			}
+			var item ChatStreamResponse
+			err := json.Unmarshal([]byte(data), &item)
+			if err != nil {
+				logrus.Errorf("解析失败 %v %s", err, data)
+				continue
+			}
+			if len(item.Choices) > 0 {
+				msgChan <- item.Choices[0].Delta.Content
+			}
+		}
 	}()
-
-	for scanner.Scan() {
-		text := scanner.Text()
-		if text == "" {
-			continue
-		}
-		data := text[6:]
-		if data == "[DONE]" {
-			close(msgChan)
-			return
-		}
-		var item ChatStreamResponse
-		err = json.Unmarshal([]byte(data), &item)
-		if err != nil {
-			fmt.Printf("解析失败 %s %s", err, data)
-			continue
-		}
-		if len(item.Choices) > 0 {
-			msgChan <- item.Choices[0].Delta.Content
-		}
-	}
 
 	return msgChan, nil
 }

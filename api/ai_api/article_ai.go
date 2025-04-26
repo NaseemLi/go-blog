@@ -17,14 +17,14 @@ import (
 )
 
 type ArticleAiRequest struct {
-	Content string `json:"content" binding:"required"`
+	Content string `form:"content" binding:"required"`
 }
 
 func (AiApi) ArticleAiView(c *gin.Context) {
 	cr := middleware.GetBind[ArticleAiRequest](c)
 	// 查这个内容关联的文章列表
 	if !global.Config.Ai.Enable {
-		res.FailWithMsg("AI功能未开启", c)
+		res.SSEfail("AI功能未开启", c)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (AiApi) ArticleAiView(c *gin.Context) {
 		source, _ := query.Source()
 		byteData, _ := json.Marshal(source)
 		logrus.Errorf("查询失败 %s \n %s", err, string(byteData))
-		res.FailWithMsg("查询失败", c)
+		res.SSEfail("查询失败", c)
 		return
 	}
 	var list []string
@@ -57,10 +57,10 @@ func (AiApi) ArticleAiView(c *gin.Context) {
 	content := "[" + strings.Join(list, ",") + "]"
 	msgChan, err := aiservice.ChatStream(cr.Content, content)
 	if err != nil {
-		res.FailWithMsg("ai分析失败", c)
+		res.SSEfail("ai分析失败", c)
 		return
 	}
 	for s := range msgChan {
-		res.OkWithData(s, c)
+		res.SSEok(s, c)
 	}
 }
