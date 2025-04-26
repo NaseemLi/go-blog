@@ -27,6 +27,11 @@ func LogMiddleware(c *gin.Context) {
 	//请求中间件
 	log.SetRequest(c)
 	c.Set("log", log)
+	if c.Request.URL.Path == "/api/ai/article" {
+		c.Next()
+		log.MiddlewareSave()
+		return
+	}
 
 	res := &ResponseWriter{
 		ResponseWriter: c.Writer,
