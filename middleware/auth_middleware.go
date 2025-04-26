@@ -22,7 +22,7 @@ func AuthMiddelware(c *gin.Context) {
 		return
 	}
 	c.Set("claims", claims)
-	return
+
 }
 
 func AdminMiddelware(c *gin.Context) {
