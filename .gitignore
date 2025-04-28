@@ -25,3 +25,4 @@ logs/**
 # --- 忽略配置文件 ---
 jsconfig.json
 settings.yaml
+settings-dev.yaml
