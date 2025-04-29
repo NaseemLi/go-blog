@@ -83,7 +83,6 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 	}
 
 	res.OkWithData(data, c)
-	return
 }
 
 func (Siteapi) SiteInfoQQView(c *gin.Context) {
@@ -185,7 +184,7 @@ func (Siteapi) SiteUpdateView(c *gin.Context) {
 	core.SetConf()
 
 	res.OkWithMsg("更新站点配置成功", c)
-	return
+
 }
 
 func UpdateSite(site conf.Site) error {
@@ -201,7 +200,7 @@ func UpdateSite(site conf.Site) error {
 
 	file, err := os.Open(site.Project.WebPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("%s 文件不存在", site.Project.WebPath))
+		return fmt.Errorf("%s 文件不存在", site.Project.WebPath)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(file)
