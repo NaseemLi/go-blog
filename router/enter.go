@@ -29,6 +29,7 @@ func Run() {
 	ChatRouter(nr)
 	SearchRouter(nr)
 	AiRouter(nr)
+	DataRouter(nr)
 
 	addr := global.Config.System.Addr()
 	r.Run(addr)

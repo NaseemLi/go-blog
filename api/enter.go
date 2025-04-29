@@ -7,6 +7,7 @@ import (
 	captchaapi "goblog/api/captcha_api"
 	chatapi "goblog/api/chat_api"
 	commentapi "goblog/api/comment_api"
+	dataapi "goblog/api/data_api"
 	focusapi "goblog/api/focus_api"
 	globalnotificationapi "goblog/api/global_notification_api"
 	imageapi "goblog/api/image_api"
@@ -32,6 +33,7 @@ type Api struct {
 	ChatApi               chatapi.ChatApi
 	SearchApi             searchapi.SearchApi
 	AiApi                 aiapi.AiApi
+	DataApi               dataapi.DataApi
 }
 
 var App = Api{}

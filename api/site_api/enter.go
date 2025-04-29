@@ -8,6 +8,7 @@ import (
 	"goblog/core"
 	"goblog/global"
 	"goblog/middleware"
+	redissite "goblog/service/redis_service/redis_site"
 	"os"
 
 	"github.com/PuerkitoBio/goquery"
@@ -41,6 +42,7 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 
 	if cr.Name == "site" {
 		global.Config.Site.About.Version = global.Version
+		redissite.SetFlow()
 		res.OkWithData(SiteInfoResponse{
 			Site: global.Config.Site,
 			Qiniu: Qiniu{
