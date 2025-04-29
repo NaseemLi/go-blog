@@ -22,6 +22,15 @@ type SiteInfoRequest struct {
 	Name string `uri:"name"`
 }
 
+type Qiniu struct {
+	Enable bool `json:"enable"`
+}
+
+type SiteInfoResponse struct {
+	Qiniu Qiniu `json:"qiNiu"`
+	conf.Site
+}
+
 func (Siteapi) SiteInfoView(c *gin.Context) {
 	var cr SiteInfoRequest
 	err := c.ShouldBindUri(&cr)
@@ -32,7 +41,12 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 
 	if cr.Name == "site" {
 		global.Config.Site.About.Version = global.Version
-		res.OkWithData(global.Config.Site, c)
+		res.OkWithData(SiteInfoResponse{
+			Site: global.Config.Site,
+			Qiniu: Qiniu{
+				global.Config.QiNiu.Enable,
+			},
+		}, c)
 	}
 
 	//判断角色是不是
