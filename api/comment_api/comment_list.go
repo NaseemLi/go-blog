@@ -35,6 +35,7 @@ type CommentListResponse struct {
 	ArticleCover string                    `json:"articleCover"`
 	DiggCount    int                       `json:"diggCount"`
 	Relation     relationshipenum.Relation `json:"relation,omitempty"` // 关系
+	IsMe         bool                      `json:"isMe"`               // 是否是我
 }
 
 func (CommentApi) CommentListView(c *gin.Context) {
@@ -45,7 +46,11 @@ func (CommentApi) CommentListView(c *gin.Context) {
 	switch cr.Type {
 	case 1: //查我发了哪些文章
 		var articleIDList []uint
-		global.DB.Model(&models.ArticleModel{}).Where("user_id = ? and status = ?", claims.UserID, enum.ArticleStatusPublished).Select("id").Scan(&articleIDList)
+		global.DB.Model(&models.ArticleModel{}).Where("user_id = ? and status = ?",
+			claims.UserID, enum.ArticleStatusPublished).
+			Select("id").
+			Scan(&articleIDList)
+
 		query.Where("article_id in ?", articleIDList)
 		cr.UserID = 0
 	case 2: //查我发布的评论
@@ -86,6 +91,7 @@ func (CommentApi) CommentListView(c *gin.Context) {
 			ArticleCover: model.ArticleModel.Cover,
 			DiggCount:    model.DiggCount + rediscomment.GetCacheDigg(model.ID),
 			Relation:     RelationMap[model.UserID],
+			IsMe:         claims.UserID == model.UserID,
 		})
 	}
 
