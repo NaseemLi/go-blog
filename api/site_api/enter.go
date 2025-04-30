@@ -27,8 +27,13 @@ type Qiniu struct {
 	Enable bool `json:"enable"`
 }
 
+type Ai struct {
+	Enable bool `json:"enable"`
+}
+
 type SiteInfoResponse struct {
 	Qiniu Qiniu `json:"qiNiu"`
+	Ai    Ai    `json:"ai"`
 	conf.Site
 }
 
@@ -46,7 +51,10 @@ func (Siteapi) SiteInfoView(c *gin.Context) {
 		res.OkWithData(SiteInfoResponse{
 			Site: global.Config.Site,
 			Qiniu: Qiniu{
-				global.Config.QiNiu.Enable,
+				Enable: global.Config.QiNiu.Enable,
+			},
+			Ai: Ai{
+				Enable: global.Config.Ai.Enable,
 			},
 		}, c)
 	}
