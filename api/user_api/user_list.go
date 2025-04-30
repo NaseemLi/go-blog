@@ -5,6 +5,7 @@ import (
 	"goblog/common/res"
 	"goblog/middleware"
 	"goblog/models"
+	"goblog/models/enum"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,16 +16,17 @@ type UserListRequest struct {
 }
 
 type UserListRespone struct {
-	ID            uint       `json:"id"`
-	Nickname      string     `json:"nickname"`
-	Username      string     `json:"username"`
-	Avatar        string     `json:"avatar"`
-	IP            string     `json:"ip"`
-	Addr          string     `json:"addr"`
-	ArticleCount  int        `json:"articleCount"`
-	IndexCount    int        `json:"indexCount"` //主页访问数量
-	CreateAt      time.Time  `json:"createAt"`
-	LastLoginDate *time.Time `json:"lastLoginDate"`
+	ID            uint          `json:"id"`
+	Nickname      string        `json:"nickname"`
+	Username      string        `json:"username"`
+	Avatar        string        `json:"avatar"`
+	IP            string        `json:"ip"`
+	Addr          string        `json:"addr"`
+	ArticleCount  int           `json:"articleCount"`
+	IndexCount    int           `json:"indexCount"` //主页访问数量
+	CreateAt      time.Time     `json:"createAt"`
+	LastLoginDate *time.Time    `json:"lastLoginDate"`
+	Role          enum.RoleType `json:"role"` // 角色
 }
 
 func (UserApi) UserListView(c *gin.Context) {
@@ -48,6 +50,7 @@ func (UserApi) UserListView(c *gin.Context) {
 			ArticleCount: len(v.ArticleList),
 			IndexCount:   1000,
 			CreateAt:     v.CreatedAt,
+			Role:         v.Role,
 		}
 		if len(v.LoginList) > 0 {
 			item.LastLoginDate = &v.LoginList[len(v.LoginList)-1].CreatedAt
