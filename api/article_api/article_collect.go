@@ -92,20 +92,27 @@ func (ArticleApi) ArticleCollectView(c *gin.Context) {
 		return
 	}
 	res.OkWithMsg("取消收藏成功", c)
-	//TODO:收藏数同步缓存
 	redisarticle.SetCacheCollect(cr.CollectID, false)
-	// global.DB.Model(&collectModel).Update("article_count", gorm.Expr("article_count - 1"))
+}
+
+type ArticleCollectPatchRemoveRequest struct {
+	CollectID     uint   `json:"collectID"`
+	ArticleIDList []uint `json:"articleIDList"`
 }
 
 func (ArticleApi) ArticleCollectPatchRemoveView(c *gin.Context) {
-	var cr = middleware.GetBind[models.RemoveRequest](c)
+	var cr = middleware.GetBind[ArticleCollectPatchRemoveRequest](c)
 
 	claims := jwts.GetClaims(c)
 	var userCollectList []models.UserArticleCollectModel
-	global.DB.Find(&userCollectList, "id in ? and user_id = ?", cr.IDList, claims.UserID)
+	global.DB.Find(&userCollectList, "collect_id = ? and article_id in ? and user_id = ?",
+		cr.CollectID, cr.ArticleIDList, claims.UserID)
 
 	if len(userCollectList) > 0 {
 		global.DB.Delete(&userCollectList)
+		for _, v := range cr.ArticleIDList {
+			redisarticle.SetCacheCollect(v, false)
+		}
 	}
 	res.OkWithMsg(fmt.Sprintf("成功删除 %d 篇", len(userCollectList)), c)
 }
