@@ -3,6 +3,7 @@ package router
 import (
 	"goblog/api"
 	articleapi "goblog/api/article_api"
+	"goblog/common"
 	"goblog/middleware"
 	"goblog/models"
 
@@ -35,6 +36,8 @@ func ArticleRouter(r *gin.RouterGroup) {
 
 	r.GET("category/options", middleware.AuthMiddelware, app.CategoryOptionsView)
 	r.GET("article/tag/options", middleware.AuthMiddelware, app.ArticleTagOptions)
+
+	r.GET("article/auth_recommend", middleware.BindQueryMiddleware[common.PageInfo], app.AuthRecommentView)
 
 	r.DELETE("article/collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleCollectPatchRemoveView)
 }
