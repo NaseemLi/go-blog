@@ -72,6 +72,7 @@ func (ArticleApi) ArticleDetailView(c *gin.Context) {
 			data.IsDigg = true
 		}
 
+		//用户是否收藏了文章 只要在其中任何一个收藏夹内 都判断用户收藏了文章
 		var userCollectModel models.UserArticleCollectModel
 		err = global.DB.Take(&userCollectModel, "user_id = ? and article_id = ?", claims.UserID, article.ID).Error
 		if err == nil {
@@ -84,10 +85,10 @@ func (ArticleApi) ArticleDetailView(c *gin.Context) {
 	collectCount := redisarticle.GetCacheCollect(article.ID)
 	commentCount := redisarticle.GetCacheComment(article.ID)
 
-	article.DiggCount = article.DiggCount + diggCount
-	article.CollectCount = article.CollectCount + collectCount
-	article.LookCount = article.LookCount + lookCount
-	article.CommentCount = article.CommentCount + commentCount
+	data.DiggCount = article.DiggCount + diggCount
+	data.CollectCount = article.CollectCount + collectCount
+	data.LookCount = article.LookCount + lookCount
+	data.CommentCount = article.CommentCount + commentCount
 
 	if article.CategoryModel != nil {
 		data.CategoryTitle = &article.CategoryModel.Title
