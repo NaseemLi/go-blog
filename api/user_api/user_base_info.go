@@ -4,25 +4,29 @@ import (
 	"goblog/common/res"
 	"goblog/global"
 	"goblog/models"
+	relationshipenum "goblog/models/enum/relationship_enum"
+	focusservice "goblog/service/focus_service"
 	redisuser "goblog/service/redis_service/redis_user"
+	"goblog/utils/jwts"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserBaseInfoResponse struct {
-	UserID       uint   `json:"userID"`
-	CodeAge      int    `json:"codeAge"`
-	Avatar       string `json:"avatar"`
-	Nickname     string `json:"nickname"`
-	LookCount    int    `json:"lookCount"`
-	ArticleCount int    `json:"articleCount"`
-	FansCount    int    `json:"fansCount"`
-	FollowCount  int    `json:"followCount"`
-	Place        string `json:"place"`
-	OpenFollow   bool   `json:"openFollow"`  // 是否公开关注
-	OpenCollect  bool   `json:"openCollect"` // 是否公开收藏
-	OpenFans     bool   `json:"openFans"`    // 是否公开粉丝
-	HomeStyleID  uint   `json:"homeStyleID"` // 主页风格
+	UserID       uint                      `json:"userID"`
+	CodeAge      int                       `json:"codeAge"`
+	Avatar       string                    `json:"avatar"`
+	Nickname     string                    `json:"nickname"`
+	LookCount    int                       `json:"lookCount"`
+	ArticleCount int                       `json:"articleCount"`
+	FansCount    int                       `json:"fansCount"`
+	FollowCount  int                       `json:"followCount"`
+	Place        string                    `json:"place"`
+	OpenFollow   bool                      `json:"openFollow"`  // 是否公开关注
+	OpenCollect  bool                      `json:"openCollect"` // 是否公开收藏
+	OpenFans     bool                      `json:"openFans"`    // 是否公开粉丝
+	HomeStyleID  uint                      `json:"homeStyleID"` // 主页风格
+	Relation     relationshipenum.Relation `json:"relation"`    // 关系
 }
 
 func (UserApi) UserBaseInfoView(c *gin.Context) {
@@ -53,6 +57,11 @@ func (UserApi) UserBaseInfoView(c *gin.Context) {
 		OpenCollect:  user.UserConfModel.OpenCollect,
 		OpenFans:     user.UserConfModel.OpenFans,
 		HomeStyleID:  user.UserConfModel.HomeStyleID,
+	}
+
+	claims, err := jwts.ParseTokenByGin(c)
+	if err == nil && claims != nil {
+		data.Relation = focusservice.CalcUserRelationship(claims.UserID, cr.ID)
 	}
 
 	var focusList []models.UserFocusModel
