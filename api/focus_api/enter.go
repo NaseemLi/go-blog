@@ -7,6 +7,8 @@ import (
 	"goblog/global"
 	"goblog/middleware"
 	"goblog/models"
+	relationshipenum "goblog/models/enum/relationship_enum"
+	focusservice "goblog/service/focus_service"
 	"goblog/utils/jwts"
 	"time"
 
@@ -62,18 +64,20 @@ type FocusUserListRequest struct {
 	UserID      uint `form:"userID"`
 }
 
-type FocusUserListResponse struct {
-	FocusUserID       uint      `json:"focusUserID"`
-	FocusUserNickname string    `json:"focusUserNickname"`
-	FocusUserAvatar   string    `json:"focusUserAvatar"`
-	FocusUserAbstract string    `json:"focusUserAbstract"`
-	CreateAt          time.Time `json:"createAt"`
+type UserListResponse struct {
+	UserID       uint                      `json:"userID"`
+	UserNickname string                    `json:"userNickname"`
+	UserAvatar   string                    `json:"userAvatar"`
+	UserAbstract string                    `json:"userAbstract"`
+	Relationship relationshipenum.Relation `json:"relationship"`
+	CreateAt     time.Time                 `json:"createAt"`
 }
 
 // 我的关注和用户的关注
 func (FocusApi) FocusUserListView(c *gin.Context) {
 	cr := middleware.GetBind[FocusUserListRequest](c)
 	claims, err := jwts.ParseTokenByGin(c)
+
 	if cr.UserID != 0 {
 		//如果传了用户id,就查这个人关注的用户列表
 		var userconf models.UserConfModel
@@ -121,25 +125,27 @@ func (FocusApi) FocusUserListView(c *gin.Context) {
 		Where:    query,
 	})
 
-	var list = make([]FocusUserListResponse, 0)
+	var m = map[uint]relationshipenum.Relation{}
+	if err == nil && claims != nil {
+		var userIDList []uint
+		for _, v := range _list {
+			userIDList = append(userIDList, v.FocusUserID)
+		}
+		m = focusservice.CalcUserPatchRelationship(claims.UserID, userIDList)
+	}
+
+	var list = make([]UserListResponse, 0)
 	for _, model := range _list {
-		list = append(list, FocusUserListResponse{
-			FocusUserID:       model.FocusUserModel.ID,
-			FocusUserNickname: model.FocusUserModel.Nickname,
-			FocusUserAvatar:   model.FocusUserModel.Avatar,
-			FocusUserAbstract: model.FocusUserModel.Abstract,
-			CreateAt:          model.CreatedAt,
+		list = append(list, UserListResponse{
+			UserID:       model.FocusUserModel.ID,
+			UserNickname: model.FocusUserModel.Nickname,
+			UserAvatar:   model.FocusUserModel.Avatar,
+			UserAbstract: model.FocusUserModel.Abstract,
+			Relationship: m[model.FocusUserID],
+			CreateAt:     model.CreatedAt,
 		})
 	}
 	res.OkWithList(list, len(list), c)
-}
-
-type FansUserListResponse struct {
-	FansUserID       uint      `json:"fansUserID"`
-	FansUserNickname string    `json:"fansUserNickname"`
-	FansUserAvatar   string    `json:"fansUserAvatar"`
-	FansUserAbstract string    `json:"fansUserAbstract"`
-	CreateAt         time.Time `json:"createAt"`
 }
 
 // 我的粉丝和用户的粉丝
@@ -194,14 +200,24 @@ func (FocusApi) FansUserListView(c *gin.Context) {
 		Where:    query,
 	})
 
-	var list = make([]FansUserListResponse, 0)
+	var m = map[uint]relationshipenum.Relation{}
+	if err == nil && claims != nil {
+		var userIDList []uint
+		for _, v := range _list {
+			userIDList = append(userIDList, v.UserID)
+		}
+		m = focusservice.CalcUserPatchRelationship(claims.UserID, userIDList)
+	}
+
+	var list = make([]UserListResponse, 0)
 	for _, model := range _list {
-		list = append(list, FansUserListResponse{
-			FansUserID:       model.UserID,
-			FansUserNickname: model.FocusUserModel.Nickname,
-			FansUserAvatar:   model.FocusUserModel.Avatar,
-			FansUserAbstract: model.FocusUserModel.Abstract,
-			CreateAt:         model.CreatedAt,
+		list = append(list, UserListResponse{
+			UserID:       model.UserID,
+			UserNickname: model.FocusUserModel.Nickname,
+			UserAvatar:   model.FocusUserModel.Avatar,
+			UserAbstract: model.FocusUserModel.Abstract,
+			Relationship: m[model.FocusUserID],
+			CreateAt:     model.CreatedAt,
 		})
 	}
 	res.OkWithList(list, len(list), c)

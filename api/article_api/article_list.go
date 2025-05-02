@@ -97,6 +97,16 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		}
 	}
 
+	query := global.DB.Where("")
+	if cr.CollectID != nil && *cr.CollectID != 0 {
+		var articleIDList []uint
+		global.DB.Model(&models.UserArticleCollectModel{}).
+			Where("collect_id = ?", cr.CollectID).
+			Select("article_id").
+			Scan(&articleIDList)
+		query = query.Where("id in ?", articleIDList)
+	}
+
 	if cr.Order != "" {
 		_, ok := orderColumnMap[cr.Order]
 		if !ok {
@@ -131,6 +141,7 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		Likes:        []string{"title"},
 		PageInfo:     cr.PageInfo,
 		DefaultOrder: "created_at desc",
+		Where:        query,
 		Preloads:     []string{"UserModel", "CategoryModel"},
 	}
 
