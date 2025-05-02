@@ -40,5 +40,5 @@ func ArticleRouter(r *gin.RouterGroup) {
 	r.GET("article/auth_recommend", middleware.BindQueryMiddleware[common.PageInfo], app.AuthRecommentView)
 	r.GET("article/article_recommend", middleware.BindQueryMiddleware[common.PageInfo], app.ArticleRecommentView)
 
-	r.DELETE("article/collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.ArticleCollectPatchRemoveView)
+	r.DELETE("article/collect", middleware.AuthMiddelware, middleware.BindJsonMiddleware[articleapi.ArticleCollectPatchRemoveRequest], app.ArticleCollectPatchRemoveView)
 }
