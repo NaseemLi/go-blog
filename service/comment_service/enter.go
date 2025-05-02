@@ -3,6 +3,7 @@ package commentservice
 import (
 	"goblog/global"
 	"goblog/models"
+	relationshipenum "goblog/models/enum/relationship_enum"
 	rediscomment "goblog/service/redis_service/redis_comment"
 
 	"time"
@@ -60,24 +61,26 @@ func GetCommentTreeV2(id uint) (model *models.CommentModel) {
 }
 
 type CommentResponse struct {
-	ID           uint               `json:"id"`
-	CreatedAt    time.Time          `json:"createdAt"`
-	Content      string             `json:"content"`
-	UserID       uint               `json:"userID"`
-	UserNickname string             `json:"userNickname"`
-	UserAvatar   string             `json:"userAvatar"`
-	ArticleID    uint               `json:"articleID"`
-	ParentID     *uint              `json:"parentID"`
-	DiggCount    int                `json:"diggCount"`
-	ApplyCount   int                `json:"applyCount"`
-	SubComments  []*CommentResponse `json:"subComments"`
+	ID           uint                      `json:"id"`
+	CreatedAt    time.Time                 `json:"createdAt"`
+	Content      string                    `json:"content"`
+	UserID       uint                      `json:"userID"`
+	UserNickname string                    `json:"userNickname"`
+	UserAvatar   string                    `json:"userAvatar"`
+	ArticleID    uint                      `json:"articleID"`
+	ParentID     *uint                     `json:"parentID"`
+	DiggCount    int                       `json:"diggCount"`
+	ApplyCount   int                       `json:"applyCount"`
+	SubComments  []*CommentResponse        `json:"subComments"`
+	IsDigg       bool                      `json:"isDigg"`
+	Relation     relationshipenum.Relation `json:"relation"`
 }
 
-func GetCommentTreeV3(id uint) *CommentResponse {
-	return getCommentTreeV3(id, 1)
+func GetCommentTreeV3(id uint, userRelation map[uint]relationshipenum.Relation, userDiggMap map[uint]bool) *CommentResponse {
+	return getCommentTreeV3(id, 1, userRelation, userDiggMap)
 }
 
-func getCommentTreeV3(id uint, line int) *CommentResponse {
+func getCommentTreeV3(id uint, line int, userRelation map[uint]relationshipenum.Relation, userDiggMap map[uint]bool) *CommentResponse {
 	model := &models.CommentModel{
 		Model: models.Model{ID: id},
 	}
@@ -95,6 +98,8 @@ func getCommentTreeV3(id uint, line int) *CommentResponse {
 		DiggCount:    model.DiggCount + rediscomment.GetCacheDigg(model.ID),
 		ApplyCount:   rediscomment.GetCacheApply(model.ID),
 		SubComments:  make([]*CommentResponse, 0),
+		IsDigg:       userDiggMap[model.ID],
+		Relation:     userRelation[model.UserID],
 	}
 
 	if line > global.Config.Site.Article.CommentLine {
@@ -102,7 +107,7 @@ func getCommentTreeV3(id uint, line int) *CommentResponse {
 	}
 
 	for _, commentModel := range model.SubCommentList {
-		res.SubComments = append(res.SubComments, getCommentTreeV3(commentModel.ID, line+1))
+		res.SubComments = append(res.SubComments, getCommentTreeV3(commentModel.ID, line+1, userRelation, userDiggMap))
 	}
 	return res
 }
