@@ -142,6 +142,7 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		PageInfo:     cr.PageInfo,
 		DefaultOrder: "created_at desc",
 		Where:        query,
+		Debug:        true,
 		Preloads:     []string{"UserModel", "CategoryModel"},
 	}
 
