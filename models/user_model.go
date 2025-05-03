@@ -3,7 +3,6 @@ package models
 import (
 	"goblog/models/enum"
 	"math"
-	"reflect"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -65,35 +64,46 @@ func (u *UserModel) GetCodeAge() int {
 }
 
 func (u *UserModel) BeforeDelete(tx *gorm.DB) (err error) {
-	var list = []any{
-		ArticleDiggModel{},
-		ArticleModel{},
-		CategoryModel{},
-		CollectModel{},
-		CommentModel{},
-		CommentDiggModel{},
-		LogModel{},
-		UserArticleCollectModel{},
-		UserArticleLookHistoryModel{},
-		UserChatActionModel{},
-		UserFocusModel{},
-		UserGlobalNotificationModel{},
-		UserLoginModel{},
-		UserTopArticleModel{},
+	// 定义 model + 表名 的 map，更清晰、更可靠
+	models := map[string]interface{}{
+		"ArticleDiggModel":            &ArticleDiggModel{},
+		"ArticleModel":                &ArticleModel{},
+		"CategoryModel":               &CategoryModel{},
+		"CollectModel":                &CollectModel{},
+		"CommentModel":                &CommentModel{},
+		"CommentDiggModel":            &CommentDiggModel{},
+		"LogModel":                    &LogModel{},
+		"UserArticleCollectModel":     &UserArticleCollectModel{},
+		"UserArticleLookHistoryModel": &UserArticleLookHistoryModel{},
+		"UserChatActionModel":         &UserChatActionModel{},
+		"UserFocusModel":              &UserFocusModel{},
+		"UserGlobalNotificationModel": &UserGlobalNotificationModel{},
+		"UserLoginModel":              &UserLoginModel{},
+		"UserTopArticleModel":         &UserTopArticleModel{},
 	}
-	for _, model := range list {
-		count := tx.Delete(model, "user_id = ?", u.ID).RowsAffected
-		logrus.Infof("删除关联数据 %T %d条", reflect.TypeOf(model).Name(), count)
+
+	for name, model := range models {
+		res := tx.Where("user_id = ?", u.ID).Delete(model)
+		logrus.Infof("删除关联数据 %s 共 %d 条", name, res.RowsAffected)
 	}
+
+	// 删除聊天记录
 	var chatList []ChatModel
-	tx.Find("send_user_id = ? OR rev_user_id = ?", u.ID, u.ID).Delete(&chatList)
-	logrus.Infof("删除关联对话%d条", len(chatList))
+	tx.Where("send_user_id = ? OR rev_user_id = ?", u.ID, u.ID).Find(&chatList)
+	if len(chatList) > 0 {
+		tx.Delete(&chatList)
+		logrus.Infof("删除关联对话 %d 条", len(chatList))
+	}
 
+	// 删除消息（按需）
 	var messageList []ChatModel
-	tx.Find("rev_user_id = ?", u.ID).Delete(&messageList)
-	logrus.Infof("删除关联消息%d条", len(messageList))
+	tx.Where("rev_user_id = ?", u.ID).Find(&messageList)
+	if len(messageList) > 0 {
+		tx.Delete(&messageList)
+		logrus.Infof("删除关联消息 %d 条", len(messageList))
+	}
 
-	return
+	return nil
 }
 
 type UserConfModel struct {
