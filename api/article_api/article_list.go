@@ -23,7 +23,7 @@ type ArticleListRequest struct {
 	UserID     uint  `form:"userID"`
 	CategoryID *uint `form:"categoryID"`
 	Status     int   `form:"status"`
-	CollectID  *uint `form:"collectID"`
+	CollectID  int   `form:"collectID"`
 }
 
 type ArticleListResponse struct {
@@ -63,7 +63,7 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 		}
 		cr.Status = 0
 		cr.Order = ""
-		if cr.CollectID != nil && *cr.CollectID != 0 {
+		if cr.CollectID != 0 {
 			// 如果传了收藏夹id,也要看人
 			if cr.UserID == 0 {
 				res.FailWithMsg("请传入用户id", c)
@@ -98,12 +98,24 @@ func (ArticleApi) ArticleListView(c *gin.Context) {
 	}
 
 	query := global.DB.Where("")
-	if cr.CollectID != nil && *cr.CollectID != 0 {
+	if cr.CollectID != 0 {
 		var articleIDList []uint
-		global.DB.Model(&models.UserArticleCollectModel{}).
-			Where("collect_id = ?", cr.CollectID).
-			Select("article_id").
-			Scan(&articleIDList)
+		if cr.CollectID != -1 {
+			global.DB.Model(&models.UserArticleCollectModel{}).
+				Where("collect_id = ?", cr.CollectID).
+				Select("article_id").
+				Scan(&articleIDList)
+		} else {
+			// 查询所有收藏夹的文章
+			if cr.UserID == 0 {
+				res.FailWithMsg("请传入用户id", c)
+				return
+			}
+			global.DB.Model(&models.UserArticleCollectModel{}).
+				Where("user_id = ?", cr.UserID).
+				Select("article_id").
+				Scan(&articleIDList)
+		}
 		query = query.Where("id in ?", articleIDList)
 	}
 
