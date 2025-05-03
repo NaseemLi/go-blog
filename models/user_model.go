@@ -3,8 +3,10 @@ package models
 import (
 	"goblog/models/enum"
 	"math"
+	"reflect"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -58,8 +60,40 @@ func (u *UserModel) AfterCreate(tx *gorm.DB) error {
 }
 
 func (u *UserModel) GetCodeAge() int {
-	sub := time.Now().Sub(u.CreatedAt)
+	sub := time.Since(u.CreatedAt)
 	return int(math.Ceil(sub.Hours() / 24 / 365))
+}
+
+func (u *UserModel) BeforeDelete(tx *gorm.DB) (err error) {
+	var list = []any{
+		ArticleDiggModel{},
+		ArticleModel{},
+		CategoryModel{},
+		CollectModel{},
+		CommentModel{},
+		CommentDiggModel{},
+		LogModel{},
+		UserArticleCollectModel{},
+		UserArticleLookHistoryModel{},
+		UserChatActionModel{},
+		UserFocusModel{},
+		UserGlobalNotificationModel{},
+		UserLoginModel{},
+		UserTopArticleModel{},
+	}
+	for _, model := range list {
+		count := tx.Delete(model, "user_id = ?", u.ID).RowsAffected
+		logrus.Infof("删除关联数据 %T %d条", reflect.TypeOf(model).Name(), count)
+	}
+	var chatList []ChatModel
+	tx.Find("send_user_id = ? OR rev_user_id = ?", u.ID, u.ID).Delete(&chatList)
+	logrus.Infof("删除关联对话%d条", len(chatList))
+
+	var messageList []ChatModel
+	tx.Find("rev_user_id = ?", u.ID).Delete(&messageList)
+	logrus.Infof("删除关联消息%d条", len(messageList))
+
+	return
 }
 
 type UserConfModel struct {

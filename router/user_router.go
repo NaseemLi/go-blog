@@ -4,6 +4,7 @@ import (
 	"goblog/api"
 	userapi "goblog/api/user_api"
 	"goblog/middleware"
+	"goblog/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,7 @@ func UserRouter(r *gin.RouterGroup) {
 	r.PUT("user/password/reset", middleware.CaptchaMiddleware, app.ResetPasswordView)
 	r.PUT("user/email/bind", middleware.CaptchaMiddleware, middleware.AuthMiddelware, app.BindEmailView)
 	r.PUT("user", middleware.AuthMiddelware, app.UserInfoUpdateView)
+	r.DELETE("user", middleware.AdminMiddelware, middleware.BindJsonMiddleware[models.RemoveRequest], app.UserRemoveView)
 	r.PUT("user/admin", middleware.AdminMiddelware, app.AdminInfoUpdateView)
 	r.DELETE("user/logout", middleware.AuthMiddelware, app.LogOutView)
 	r.POST("user/article/top", middleware.AuthMiddelware, middleware.BindJsonMiddleware[userapi.UserArticleTopRequest], app.UserArticleTopView)
