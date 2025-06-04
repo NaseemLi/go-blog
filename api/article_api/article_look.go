@@ -24,7 +24,6 @@ type ArticleLookRequest struct {
 func (ArticleApi) ArticleLookView(c *gin.Context) {
 	cr := middleware.GetBind[ArticleLookRequest](c)
 
-	// TODO: 未登录用户，浏览量如何加
 	claims, err := jwts.ParseTokenByGin(c)
 	if err != nil {
 		res.OkWithMsg("未登录", c)
